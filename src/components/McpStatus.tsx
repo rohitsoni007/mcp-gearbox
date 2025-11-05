@@ -1,28 +1,34 @@
 import { useState } from 'react';
 import { useMcpService } from '@/hooks/useMcpService';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
 
 export const McpStatus = () => {
-  const {
-    isInstalled,
-    isLoading,
-    error,
-    checkInstallation,
-    executeCommand,
-  } = useMcpService();
+  const { isInstalled, isLoading, error, checkInstallation, executeCommand } =
+    useMcpService();
+
+  console.log('~ useMcpService', isInstalled, isLoading, error);
 
   const [commandArgs, setCommandArgs] = useState('');
   const [commandOutput, setCommandOutput] = useState('');
 
   const handleExecuteCommand = async () => {
     if (!commandArgs.trim()) return;
-    
-    const args = commandArgs.trim().split(' ').filter(arg => arg.length > 0);
+
+    const args = commandArgs
+      .trim()
+      .split(' ')
+      .filter(arg => arg.length > 0);
     const result = await executeCommand(args);
     if (result) {
       setCommandOutput(result.stdout || result.stderr);
@@ -64,7 +70,10 @@ export const McpStatus = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center gap-2">
-            <Badge variant={isInstalled ? "default" : "destructive"} className="flex items-center gap-1">
+            <Badge
+              variant={isInstalled ? 'default' : 'destructive'}
+              className="flex items-center gap-1"
+            >
               {isInstalled ? (
                 <CheckCircle className="h-3 w-3" />
               ) : (
@@ -96,9 +105,7 @@ export const McpStatus = () => {
           <Card>
             <CardHeader>
               <CardTitle>MCP Commands</CardTitle>
-              <CardDescription>
-                Execute MCP CLI commands
-              </CardDescription>
+              <CardDescription>Execute MCP CLI commands</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex gap-2">
@@ -120,9 +127,12 @@ export const McpStatus = () => {
                     id="commandArgs"
                     placeholder="e.g., install filesystem, list, --version"
                     value={commandArgs}
-                    onChange={(e) => setCommandArgs(e.target.value)}
+                    onChange={e => setCommandArgs(e.target.value)}
                   />
-                  <Button onClick={handleExecuteCommand} disabled={isLoading || !commandArgs.trim()}>
+                  <Button
+                    onClick={handleExecuteCommand}
+                    disabled={isLoading || !commandArgs.trim()}
+                  >
                     Execute
                   </Button>
                 </div>

@@ -1,6 +1,5 @@
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { Button } from "@/components/ui/button";
-import { Settings, Download } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { Download } from 'lucide-react';
 
 export default function Header() {
   return (
@@ -13,20 +12,18 @@ export default function Header() {
             </div>
             <div>
               <h1 className="text-xl font-bold">MCP Manager</h1>
-              <p className="text-xs text-muted-foreground">Model Context Protocol</p>
+              <p className="text-xs text-muted-foreground">
+                Model Context Protocol
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <ThemeToggle />
             <Button variant="ghost" size="icon">
               <Download className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon">
-              <Settings className="h-5 w-5" />
             </Button>
           </div>
         </div>
       </div>
     </header>
-  )
+  );
 }

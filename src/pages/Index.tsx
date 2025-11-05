@@ -2,7 +2,6 @@ import { useState } from "react";
 import { AgentType } from "@/types/mcp";
 import { mockServers } from "@/data/mockServers";
 import { AgentPanel } from "@/components/AgentPanel";
-import { McpStatus } from "@/components/McpStatus";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Heading } from "@/components/home/Heading";
@@ -59,7 +58,7 @@ const Index = () => {
       />
 
       <Tabs value={activeAgent} onValueChange={(v) => setActiveAgent(v as AgentType)} className="space-y-6">
-        <TabsList className="grid w-full max-w-lg grid-cols-4">
+        <TabsList className="grid w-full max-w-md grid-cols-3">
           <TabsTrigger value="claude" className="gap-2">
             <div className="h-4 w-4 rounded-full bg-gradient-primary" />
             Claude
@@ -71,10 +70,6 @@ const Index = () => {
           <TabsTrigger value="cursor" className="gap-2">
             <div className="h-4 w-4 rounded-full bg-muted-foreground" />
             Cursor
-          </TabsTrigger>
-          <TabsTrigger value="cli" className="gap-2">
-            <div className="h-4 w-4 rounded-full bg-blue-500" />
-            CLI
           </TabsTrigger>
         </TabsList>
 
@@ -100,10 +95,6 @@ const Index = () => {
             onToggleServer={(id, enabled) => handleToggleServer("cursor", id, enabled)}
             onAddServer={(serverData) => handleAddServer("cursor", serverData)}
           />
-        </TabsContent>
-
-        <TabsContent value="cli" className="space-y-4">
-          <McpStatus />
         </TabsContent>
       </Tabs>
     </div>

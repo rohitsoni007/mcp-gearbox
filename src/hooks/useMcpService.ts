@@ -12,6 +12,7 @@ export interface UseMcpServiceReturn {
 
 export const useMcpService = (): UseMcpServiceReturn => {
   const [isInstalled, setIsInstalled] = useState(false);
+  console.log("🚀 ~ useMcpService ~ isInstalled:", isInstalled)
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();

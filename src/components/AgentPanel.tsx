@@ -1,29 +1,50 @@
-import { useState } from "react";
-import { MCPServer } from "@/types/mcp";
-import { ServerCard } from "./ServerCard";
-import { Input } from "@/components/ui/input";
-import { Search, LayoutGrid, LayoutList } from "lucide-react";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { AddServerDialog } from "./AddServerDialog";
+import { useState } from 'react';
+import { MCPServer } from '@/types/mcp';
+import { ServerCard } from './ServerCard';
+import { Input } from '@/components/ui/input';
+import { Search, LayoutGrid, LayoutList } from 'lucide-react';
+// import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { AddServerDialog } from './AddServerDialog';
+import { useMcpService } from '@/hooks/useMcpService';
 
 interface AgentPanelProps {
   servers: MCPServer[];
   onToggleServer: (id: string, enabled: boolean) => void;
-  onAddServer?: (server: { name: string; description: string; version: string; category?: string; icon?: string }) => void;
+  onAddServer?: (server: {
+    name: string;
+    description: string;
+    version: string;
+    category?: string;
+    icon?: string;
+  }) => void;
 }
 
-export function AgentPanel({ servers, onToggleServer, onAddServer }: AgentPanelProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
+export function AgentPanel({
+  servers,
+  onToggleServer,
+  onAddServer,
+}: AgentPanelProps) {
 
+  const { isInstalled, isLoading, error, checkInstallation, executeCommand } =
+      useMcpService();
+  
+  console.log('~ useMcpService', isInstalled, isLoading, error);
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid');
+
+  const getServerByAgent = () => {
+    executeCommand('mcp list -a continue -j');
+
+  }
   const filteredServers = servers.filter(
-    (server) =>
+    server =>
       server.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       server.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
       server.category?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const activeCount = servers.filter((s) => s.enabled).length;
+  const activeCount = servers.filter(s => s.enabled).length;
 
   return (
     <div className="space-y-6">
@@ -33,7 +54,7 @@ export function AgentPanel({ servers, onToggleServer, onAddServer }: AgentPanelP
           <Input
             placeholder="Search servers..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={e => setSearchQuery(e.target.value)}
             className="pl-10"
           />
         </div>
@@ -44,20 +65,36 @@ export function AgentPanel({ servers, onToggleServer, onAddServer }: AgentPanelP
         <div className="text-sm text-muted-foreground">
           {activeCount} of {servers.length} servers active
         </div>
-        <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && setViewMode(value as "list" | "grid")}>
+        {/* <ToggleGroup
+          type="single"
+          value={viewMode}
+          onValueChange={value =>
+            value && setViewMode(value as 'list' | 'grid')
+          }
+        >
           <ToggleGroupItem value="list" aria-label="List view">
             <LayoutList className="h-4 w-4" />
           </ToggleGroupItem>
           <ToggleGroupItem value="grid" aria-label="Grid view">
             <LayoutGrid className="h-4 w-4" />
           </ToggleGroupItem>
-        </ToggleGroup>
+        </ToggleGroup> */}
       </div>
 
-      <div className={viewMode === "grid" ? "grid gap-4 md:grid-cols-2 lg:grid-cols-3" : "grid gap-4"}>
+      <div
+        className={
+          viewMode === 'grid'
+            ? 'grid gap-4 md:grid-cols-2 lg:grid-cols-3'
+            : 'grid gap-4'
+        }
+      >
         {filteredServers.length > 0 ? (
-          filteredServers.map((server) => (
-            <ServerCard key={server.id} server={server} onToggle={onToggleServer} />
+          filteredServers.map(server => (
+            <ServerCard
+              key={server.id}
+              server={server}
+              onToggle={onToggleServer}
+            />
           ))
         ) : (
           <div className="text-center py-12 text-muted-foreground col-span-full">
