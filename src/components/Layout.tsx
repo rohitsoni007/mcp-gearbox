@@ -1,51 +1,19 @@
-import { Link, useLocation } from '@tanstack/react-router';
-import { Button } from './ui/button';
-import { ThemeToggle } from './ThemeToggle';
 import { ReactNode } from 'react';
+import Header from './Header';
 
 interface LayoutProps {
   children: ReactNode;
 }
 
 export default function Layout({ children }: LayoutProps) {
-  const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-background">
-      <nav className="border-b border-border bg-card">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <h1 className="text-lg font-semibold">Electron + shadcn/ui</h1>
-            <div className="flex items-center gap-2">
-              <Button
-                variant={location.pathname === '/' ? 'default' : 'ghost'}
-                size="sm"
-                asChild
-              >
-                <Link to="/">Home</Link>
-              </Button>
-              <Button
-                variant={location.pathname === '/about' ? 'default' : 'ghost'}
-                size="sm"
-                asChild
-              >
-                <Link to="/about">About</Link>
-              </Button>
-              <Button
-                variant={
-                  location.pathname === '/settings' ? 'default' : 'ghost'
-                }
-                size="sm"
-                asChild
-              >
-                <Link to="/settings">Settings</Link>
-              </Button>
-              <ThemeToggle />
-            </div>
-          </div>
-        </div>
-      </nav>
-      <main>{children}</main>
+    <div className="min-h-screen bg-gradient-radial">
+      {/* <Header /> */}
+
+      <main className="container mx-auto px-6 py-8">
+        {children}
+      </main>
     </div>
   );
 }
