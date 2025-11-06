@@ -1,7 +1,15 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
+/* tailwind-config */
 @theme {
+  --container-padding: 2rem;
+  --container-center: true;
+  --container-2xl: 1400px;
+
+  --radius: 0.5rem;
+
+  /* 🎨 Colors */
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
@@ -10,52 +18,171 @@
 
   --color-primary: hsl(var(--primary));
   --color-primary-foreground: hsl(var(--primary-foreground));
+
   --color-secondary: hsl(var(--secondary));
   --color-secondary-foreground: hsl(var(--secondary-foreground));
+
   --color-destructive: hsl(var(--destructive));
   --color-destructive-foreground: hsl(var(--destructive-foreground));
-  --color-success: hsl(var(--success));
-  --color-success-foreground: hsl(var(--success-foreground));
+
   --color-muted: hsl(var(--muted));
   --color-muted-foreground: hsl(var(--muted-foreground));
+
   --color-accent: hsl(var(--accent));
   --color-accent-foreground: hsl(var(--accent-foreground));
+
   --color-popover: hsl(var(--popover));
   --color-popover-foreground: hsl(var(--popover-foreground));
+
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
 
+  /* 🧭 Sidebar */
+  --color-sidebar-background: hsl(var(--sidebar-background));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-ring: hsl(var(--sidebar-ring));
+
+  /* 🟢 Status */
+  --color-status-online: hsl(var(--status-online));
+  --color-status-offline: hsl(var(--status-offline));
+  --color-status-restarting: hsl(var(--status-restarting));
+
+  /* 🌫️ Glass */
+  --color-glass-bg: hsl(var(--glass-bg));
+  --color-glass-border: hsl(var(--glass-border));
+
+  /* 🔲 Border Radius */
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
 
-  --container-padding: 2rem;
-  --container-max-2xl: 1400px;
+  /* 🔄 Animations */
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
 }
 
-/* Accordion animations */
-@keyframes accordion-down {
-  from {
-    height: 0;
-  }
-  to {
-    height: var(--radix-accordion-content-height);
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 240 10% 8%;
+    --foreground: 240 5% 96%;
+
+    --card: 240 8% 12%;
+    --card-foreground: 240 5% 96%;
+
+    --popover: 240 8% 12%;
+    --popover-foreground: 240 5% 96%;
+
+    --primary: 245 58% 65%;
+    --primary-foreground: 240 5% 96%;
+
+    --secondary: 240 6% 20%;
+    --secondary-foreground: 240 5% 96%;
+
+    --muted: 240 6% 18%;
+    --muted-foreground: 240 5% 64%;
+
+    --accent: 240 6% 20%;
+    --accent-foreground: 240 5% 96%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 240 5% 96%;
+
+    --border: 240 8% 20%;
+    --input: 240 8% 20%;
+    --ring: 245 58% 65%;
+
+    --radius: 0.75rem;
+
+    --status-online: 142 71% 45%;
+    --status-offline: 0 72% 51%;
+    --status-restarting: 45 93% 47%;
+
+    --gradient-primary: 245 58% 65%;
+    --gradient-secondary: 180 100% 50%;
+
+    --glass-bg: 240 8% 10%;
+    --glass-border: 240 8% 25%;
+
+    --sidebar-background: 240 10% 6%;
+    --sidebar-foreground: 240 5% 96%;
+    --sidebar-primary: 245 58% 65%;
+    --sidebar-primary-foreground: 240 5% 96%;
+    --sidebar-accent: 240 6% 15%;
+    --sidebar-accent-foreground: 240 5% 96%;
+    --sidebar-border: 240 8% 18%;
+    --sidebar-ring: 245 58% 65%;
   }
 }
 
-@keyframes accordion-up {
-  from {
-    height: var(--radix-accordion-content-height);
+@layer base {
+  * {
+    @apply border-border;
   }
-  to {
-    height: 0;
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
   }
 }
 
-@utility accordion-down {
-  animation: accordion-down 0.2s ease-out;
-}
+@layer utilities {
+  .glass-card {
+    @apply backdrop-blur-xl border;
+    background: hsl(var(--glass-bg) / 0.4);
+    border-color: hsl(var(--glass-border) / 0.5);
+  }
 
-@utility accordion-up {
-  animation: accordion-up 0.2s ease-out;
+  .glass-sidebar {
+    @apply backdrop-blur-xl border-r border-sidebar-border;
+    background: hsl(var(--sidebar-background) / 0.8);
+  }
+
+  .status-dot {
+    @apply w-2 h-2 rounded-full;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--primary)) hsl(var(--background));
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--primary));
+    border-radius: 20px;
+  }
 }
