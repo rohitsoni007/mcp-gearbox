@@ -14,21 +14,10 @@ const config: ForgeConfig = {
   },
   rebuildConfig: {},
   makers: [
-    new MakerSquirrel({
-      name: 'mcp-gearbox',
-      setupExe: 'mcp-gearbox-setup.exe',
-    }),
+    new MakerSquirrel({}),
     new MakerZIP({}, ['darwin']),
-    new MakerRpm({
-      options: {
-        name: 'mcp-gearbox',
-      },
-    }),
-    new MakerDeb({
-      options: {
-        name: 'mcp-gearbox',
-      },
-    }),
+    new MakerRpm({}),
+    new MakerDeb({}),
   ],
   plugins: [
     new VitePlugin({
