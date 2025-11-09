@@ -1,6 +1,18 @@
 import { cn } from '@/lib/utils';
 import { PanelLeft } from 'lucide-react';
 
+interface MenuItem {
+  id: string;
+  icon: React.ComponentType<{ className?: string }>;
+  isActive: boolean;
+}
+
+interface SidebarProps {
+  menus: MenuItem[];
+  onToggleAgentPanel: () => void;
+  isAgentPanelOpen: boolean;
+}
+
 export default function Sidebar({
   menus,
   onToggleAgentPanel,
@@ -21,7 +33,7 @@ export default function Sidebar({
           />
         </button>
         <div className="h-px w-8 bg-border" />
-        {menus.map(menu => (
+        {menus.map((menu: MenuItem) => (
           <button
             key={menu.id}
             className={cn(
