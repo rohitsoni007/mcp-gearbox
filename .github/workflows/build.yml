@@ -40,6 +40,11 @@ jobs:
       with:
         node-version: '20'
         cache: 'npm'
+    
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
         
     - name: Install dependencies (macOS)
       if: matrix.os == 'macos-latest'
