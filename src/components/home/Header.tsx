@@ -61,9 +61,8 @@ export default function Header({ view, setView }: HeaderProps) {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="name">Name</SelectItem>
                 <SelectItem value="stars">Stars</SelectItem>
-                <SelectItem value="status">Status</SelectItem>
+                <SelectItem value="name">Name</SelectItem>
               </SelectContent>
             </Select>
           </div>

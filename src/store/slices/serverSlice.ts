@@ -15,6 +15,7 @@ interface ServerState {
   error: string | null;
   searchQuery: string;
   sortBy: string;
+  lastFetched: number | null;
 }
 
 const initialState: ServerState = {
@@ -22,7 +23,8 @@ const initialState: ServerState = {
   isLoading: false,
   error: null,
   searchQuery: '',
-  sortBy: 'name',
+  sortBy: 'stars',
+  lastFetched: null,
 };
 
 const serverSlice = createSlice({
@@ -32,6 +34,7 @@ const serverSlice = createSlice({
     setServers: (state, action: PayloadAction<Server[]>) => {
       state.servers = action.payload;
       state.error = null;
+      state.lastFetched = Date.now();
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;

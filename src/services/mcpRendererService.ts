@@ -54,7 +54,7 @@ export class McpRendererService {
         const data = JSON.parse(result.stdout);
         return {
           success: true,
-          data,
+          data: data,
           error: null,
           raw: result,
         };
@@ -76,6 +76,7 @@ export class McpRendererService {
    * Get servers by agent using MCP CLI
    */
   static async getServersByAgent(agent: string): Promise<McpParsedResult> {
+    console.log("🚀 ~ McpRendererService ~ getServersByAgent ~ agent:", agent)
     try {
       return await this.executeCommand(['list', '-a', agent, '-j']);
     } catch (error) {
@@ -146,11 +147,3 @@ export class McpRendererService {
   }
 }
 
-// // Direct exports for convenience
-// export const isInstalled = McpRendererService.isInstalled;
-// export const executeCommand = McpRendererService.executeCommand;
-// export const getServersByAgent = McpRendererService.getServersByAgent;
-// export const getServers = McpRendererService.getServers;
-// export const removeServerByAgent = McpRendererService.removeServerByAgent;
-// export const addServerByAgent = McpRendererService.addServerByAgent;
-// export const getAgents = McpRendererService.getAgents;

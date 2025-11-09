@@ -1,19 +1,33 @@
-export type AgentType = "claude" | "gemini" | "cursor";
 
-export interface MCPServer {
-  id: string;
+
+// New interface for agent data based on the provided structure
+export interface AgentData {
+  agent: string;
   name: string;
-  description: string;
-  version: string;
-  enabled: boolean;
-  status: "active" | "inactive" | "error";
-  icon?: string;
-  category?: string;
+  installed: boolean;
+  config_exists: boolean;
+  config_path: string;
+  cli_available: boolean;
+  install_url: string;
+  details: string[];
 }
 
-export interface AgentConfig {
+// Interface for server data returned by getServersByAgent
+export interface AgentServer {
   name: string;
-  displayName: string;
-  icon: string;
+  by: string;
+  stargazer_count: number;
+  configured_name: string;
+  mcp_key: string;
   description: string;
+}
+
+// Interface for server data returned by getServers
+export interface ServerData {
+  name: string;
+  description: string;
+  mcp: Record<string, any>;
+  stargazer_count: number;
+  by: string;
+  isEnabled?: boolean;
 }

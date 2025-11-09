@@ -1,26 +1,74 @@
 import { useState, useEffect } from 'react';
 import { McpRendererService, McpParsedResult } from '@/services/mcpRendererService';
 import { useToast } from '@/hooks/use-toast';
+import { getErrorMessage } from '@/utils/commonFunctions';
+import { AgentData, AgentServer, ServerData } from '@/types/mcp';
 
-export interface UseMcpServiceReturn {
-  isInstalled: boolean;
-  isLoading: boolean;
-  error: string | null;
-  checkInstallation: () => Promise<void>;
-  executeCommand: (args: string[]) => Promise<McpParsedResult | null>;
-  getAgents: () => Promise<any[] | null>;
-  getServers: () => Promise<McpParsedResult | null>;
-  getServersByAgent: (agent: string) => Promise<McpParsedResult | null>;
-  addServerByAgent: (agent: string, serverName: string) => Promise<McpParsedResult | null>;
-  removeServerByAgent: (serverName: string, agent: string) => Promise<McpParsedResult | null>;
-}
-
-export const useMcpService = (): UseMcpServiceReturn => {
+export const useMcpService = () => {
   const [isInstalled, setIsInstalled] = useState(false);
-  console.log("🚀 ~ useMcpService ~ isInstalled:", isInstalled)
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+
+  const showNotInstalledToast = () => {
+    toast({
+      title: "MCP CLI not installed",
+      description: "Please install MCP CLI first.",
+      variant: "destructive",
+    });
+  };
+
+  const showErrorToast = (title: string, description: string) => {
+    toast({
+      title,
+      description,
+      variant: "destructive",
+    });
+  };
+
+  const showSuccessToast = (title: string, description: string) => {
+    toast({
+      title,
+      description,
+    });
+  };
+
+  const handleError = (err: unknown, title: string) => {
+    const errorMessage = getErrorMessage(err);
+    setError(errorMessage);
+    showErrorToast(title, errorMessage);
+  };
+
+  const executeWithInstallCheck = async <T,>(
+    operation: () => Promise<McpParsedResult>,
+    errorTitle: string,
+    successMessage?: { title: string; description: string }
+  ): Promise<T | null> => {
+    if (!isInstalled) {
+      showNotInstalledToast();
+      return null;
+    }
+
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await operation();
+      if (!result.success) {
+        setError(result.error);
+        showErrorToast(errorTitle, result.error || errorTitle);
+        return null;
+      }
+      if (successMessage) {
+        showSuccessToast(successMessage.title, successMessage.description);
+      }
+      return result.data as T;
+    } catch (err) {
+      handleError(err, errorTitle);
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const checkInstallation = async () => {
     setIsLoading(true);
@@ -32,7 +80,7 @@ export const useMcpService = (): UseMcpServiceReturn => {
         setError('MCP CLI is not installed. Please install it first.');
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      const errorMessage = getErrorMessage(err);
       setError(errorMessage);
       setIsInstalled(false);
     } finally {
@@ -41,239 +89,58 @@ export const useMcpService = (): UseMcpServiceReturn => {
   };
 
   const executeCommand = async (args: string[]): Promise<McpParsedResult | null> => {
-    if (!isInstalled) {
-      toast({
-        title: "MCP CLI not installed",
-        description: "Please install MCP CLI first.",
-        variant: "destructive",
-      });
-      return null;
-    }
-
-    setIsLoading(true);
-    setError(null);
-    try {
-      const result = await McpRendererService.executeCommand(args);
-      if (!result.success) {
-        setError(result.error);
-        toast({
-          title: "Command failed",
-          description: result.error || 'Command execution failed',
-          variant: "destructive",
-        });
-      }
-      return result;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Command execution failed';
-      setError(errorMessage);
-      toast({
-        title: "Command failed",
-        description: errorMessage,
-        variant: "destructive",
-      });
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
+    return executeWithInstallCheck<any>(
+      () => McpRendererService.executeCommand(args),
+      'Command failed'
+    );
   };
 
-  const getAgents = async (): Promise<any[] | null> => {
-    if (!isInstalled) {
-      toast({
-        title: "MCP CLI not installed",
-        description: "Please install MCP CLI first.",
-        variant: "destructive",
-      });
-      return null;
-    }
-
-    setIsLoading(true);
-    setError(null);
-    try {
-      const result = await McpRendererService.getAgents();
-      if (!result.success) {
-        setError(result.error);
-        toast({
-          title: "Command failed",
-          description: result.error || 'Failed to get agents',
-          variant: "destructive",
-        });
-        return null;
-      }
-      return result.data?.agents || null;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Command execution failed';
-      setError(errorMessage);
-      toast({
-        title: "Command failed",
-        description: errorMessage,
-        variant: "destructive",
-      });
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
+  const getAgents = async (): Promise<AgentData[]> => {
+    const result = await executeWithInstallCheck<{ agents: any[] }>(
+      () => McpRendererService.getAgents(),
+      'Failed to get agents'
+    );
+    return result?.agents || [];
   };
 
-  const getServers = async (): Promise<McpParsedResult | null> => {
-    if (!isInstalled) {
-      toast({
-        title: "MCP CLI not installed",
-        description: "Please install MCP CLI first.",
-        variant: "destructive",
-      });
-      return null;
-    }
-
-    setIsLoading(true);
-    setError(null);
-    try {
-      const result = await McpRendererService.getServers();
-      if (!result.success) {
-        setError(result.error);
-        toast({
-          title: "Command failed",
-          description: result.error || 'Failed to get servers',
-          variant: "destructive",
-        });
-      }
-      return result.data;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Command execution failed';
-      setError(errorMessage);
-      toast({
-        title: "Command failed",
-        description: errorMessage,
-        variant: "destructive",
-      });
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
+  const getServers = async (): Promise<ServerData[] | null> => {
+    return executeWithInstallCheck<ServerData[]>(
+      () => McpRendererService.getServers(),
+      'Failed to get servers'
+    );
   };
 
-  const getServersByAgent = async (agent: string): Promise<McpParsedResult | null> => {
-    if (!isInstalled) {
-      toast({
-        title: "MCP CLI not installed",
-        description: "Please install MCP CLI first.",
-        variant: "destructive",
-      });
-      return null;
-    }
-
-    setIsLoading(true);
-    setError(null);
-    try {
-      const result = await McpRendererService.getServersByAgent(agent);
-      if (!result.success) {
-        setError(result.error);
-        toast({
-          title: "Command failed",
-          description: result.error || 'Failed to get servers by agent',
-          variant: "destructive",
-        });
-      }
-      return result;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Command execution failed';
-      setError(errorMessage);
-      toast({
-        title: "Command failed",
-        description: errorMessage,
-        variant: "destructive",
-      });
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
+  const getServersByAgent = async (agent: string): Promise<AgentServer[] | null> => {
+    const result = await executeWithInstallCheck<any>(
+      () => McpRendererService.getServersByAgent(agent),
+      'Failed to get servers by agent'
+    );
+    console.log("🚀 ~ getServersByAgent ~ result:", result)
+    return result?.servers || [];
   };
 
-  const addServerByAgent = async (agent: string, serverName: string): Promise<McpParsedResult | null> => {
-    if (!isInstalled) {
-      toast({
-        title: "MCP CLI not installed",
-        description: "Please install MCP CLI first.",
-        variant: "destructive",
-      });
-      return null;
-    }
-
-    setIsLoading(true);
-    setError(null);
-    try {
-      const result = await McpRendererService.addServerByAgent(agent, serverName);
-      if (!result.success) {
-        setError(result.error);
-        toast({
-          title: "Failed to add server",
-          description: result.error || 'Failed to add server',
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Server added",
-          description: `Successfully added ${serverName} to ${agent}`,
-        });
+  const addServerByAgent = async (agent: string, serverName: string): Promise<any> => {
+    return executeWithInstallCheck<any>(
+      () => McpRendererService.addServerByAgent(agent, serverName),
+      'Failed to add server',
+      {
+        title: 'Server added',
+        description: `Successfully added ${serverName} to ${agent}`,
       }
-      return result;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Command execution failed';
-      setError(errorMessage);
-      toast({
-        title: "Command failed",
-        description: errorMessage,
-        variant: "destructive",
-      });
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
+    );
   };
 
-  const removeServerByAgent = async (serverName: string, agent: string): Promise<McpParsedResult | null> => {
-    if (!isInstalled) {
-      toast({
-        title: "MCP CLI not installed",
-        description: "Please install MCP CLI first.",
-        variant: "destructive",
-      });
-      return null;
-    }
-
-    setIsLoading(true);
-    setError(null);
-    try {
-      const result = await McpRendererService.removeServerByAgent(serverName, agent);
-      if (!result.success) {
-        setError(result.error);
-        toast({
-          title: "Failed to remove server",
-          description: result.error || 'Failed to remove server',
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Server removed",
-          description: `Successfully removed ${serverName} from ${agent}`,
-        });
+  const removeServerByAgent = async (serverName: string, agent: string): Promise<any> => {
+    return executeWithInstallCheck<any>(
+      () => McpRendererService.removeServerByAgent(serverName, agent),
+      'Failed to remove server',
+      {
+        title: 'Server removed',
+        description: `Successfully removed ${serverName} from ${agent}`,
       }
-      return result;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Command execution failed';
-      setError(errorMessage);
-      toast({
-        title: "Command failed",
-        description: errorMessage,
-        variant: "destructive",
-      });
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
+    );
   };
 
-  // Check installation status on mount
   useEffect(() => {
     checkInstallation();
   }, []);

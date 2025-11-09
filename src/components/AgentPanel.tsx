@@ -4,27 +4,27 @@ import { useMcpService } from '@/hooks/useMcpService';
 import { useEffect, useEffectEvent } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setAgents, setActiveAgent } from '@/store/slices/agentSlice';
+import { sortAgents } from '@/utils/commonFunctions';
 
 interface AgentPanelProps {
   isOpen: boolean;
 }
 
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
 export default function AgentPanel({ isOpen }: AgentPanelProps) {
   const dispatch = useAppDispatch();
-  const agents = useAppSelector((state) => state.agent.agents);
+  const agents = useAppSelector((state) => {
+    return state.agent.agents;
+  });
   const activeAgentId = useAppSelector((state) => state.agent.activeAgentId);
+  const lastFetched = useAppSelector((state) => state.agent.lastFetched);
   const { isInstalled, isLoading, error, getAgents } = useMcpService();
 
   const getAgentsData = useEffectEvent(async () => {
     const fetchedAgents = await getAgents();
     if (fetchedAgents) {
-      // Sort agents: installed first, then by name
-      const sortedAgents = [...fetchedAgents].sort((a, b) => {
-        if (a.installed === b.installed) {
-          return a.name.localeCompare(b.name);
-        }
-        return a.installed ? -1 : 1;
-      });
+      const sortedAgents = sortAgents(fetchedAgents);
 
       dispatch(setAgents(sortedAgents));
       
@@ -47,7 +47,16 @@ export default function AgentPanel({ isOpen }: AgentPanelProps) {
 
   useEffect(() => {
     if (isInstalled) {
-      getAgentsData();
+      const now = Date.now();
+      const isStale = !lastFetched || (now - lastFetched) > ONE_DAY_MS;
+      
+      // Only fetch if data is stale or doesn't exist
+      if (isStale) {
+        getAgentsData();
+      } else if (!activeAgentId && agents.length > 0) {
+        // Set first agent as active if none selected and we have cached data
+        dispatch(setActiveAgent(agents[0].agent));
+      }
     }
   }, [isInstalled]);
 
@@ -55,7 +64,7 @@ export default function AgentPanel({ isOpen }: AgentPanelProps) {
     <aside
       className={cn(
         'glass-sidebar flex h-full flex-col p-6 transition-all duration-300 ease-in-out overflow-hidden',
-        isOpen ? 'w-80 opacity-100' : 'w-0 opacity-0 p-0'
+        isOpen ? 'w-50 opacity-100' : 'w-0 opacity-0 p-0'
       )}
     >
       <div className="mb-6 flex items-center gap-3">
@@ -68,7 +77,7 @@ export default function AgentPanel({ isOpen }: AgentPanelProps) {
         </div>
       </div>
       <div className="flex flex-col gap-2 overflow-y-auto scrollbar-thin">
-        {!isInstalled && (
+        {!isInstalled && agents.length === 0 && (
           <div className="flex flex-col items-center gap-2 rounded-lg bg-muted/50 p-4 text-center">
             <AlertCircle className="h-8 w-8 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">
@@ -79,12 +88,12 @@ export default function AgentPanel({ isOpen }: AgentPanelProps) {
             </p>
           </div>
         )}
-        {isInstalled && isLoading && (
+        {isInstalled && isLoading && agents.length === 0 && (
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
           </div>
         )}
-        {isInstalled && error && (
+        {isInstalled && error && agents.length === 0 && (
           <div className="rounded-lg bg-destructive/10 p-4 text-sm text-destructive">
             Failed to load agents
           </div>

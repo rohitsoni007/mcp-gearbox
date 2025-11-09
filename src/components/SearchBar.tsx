@@ -31,7 +31,7 @@ export default function SearchBar() {
       <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
       <input
         type="text"
-        placeholder="Search servers by name, description, or author..."
+        placeholder="Search servers by name or author"
         value={localValue}
         onChange={handleSearchChange}
         className="glass-card h-12 w-full rounded-xl pl-12 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"

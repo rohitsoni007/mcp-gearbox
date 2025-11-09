@@ -1,59 +1,43 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
 import ServerCard from '../ServerCard';
 import { useMcpService } from '@/hooks/useMcpService';
 import { Loader2 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setServers, toggleServer } from '@/store/slices/serverSlice';
-import { selectAllServers, selectSearchQuery, selectServersLoading, selectSortBy } from '@/store/selectors/serverSelectors';
+import { setServers } from '@/store/slices/serverSlice';
+import {
+  selectAllServers,
+  selectSearchQuery,
+  selectServersLoading,
+  selectSortBy,
+} from '@/store/selectors/serverSelectors';
+import { useActiveAgent } from '@/hooks/useActiveAgent';
+import { ServerData } from '@/types/mcp';
+import { filterServers, sortServers } from '@/utils/commonFunctions';
 
-interface ServerListProps {
+type ServerListProps = {
   view: 'grid' | 'list';
 }
 
-// Memoized filtering function
-const filterServers = (servers: any[], query: string) => {
-  if (!Array.isArray(servers) || !query) return servers || [];
-  
-  const lowerQuery = query.toLowerCase().trim();
-  return servers.filter((server) => {
-    const nameMatch = server.name?.toLowerCase().includes(lowerQuery) || false;
-    const byMatch = server.by?.toLowerCase().includes(lowerQuery) || false;
-    return nameMatch || byMatch;
-  });
-};
-
-// Memoized sorting function
-const sortServers = (servers: any[], sortBy: string) => {
-  // Ensure servers is an array
-  if (!Array.isArray(servers)) return [];
-  
-  const serversCopy = [...servers];
-  
-  switch (sortBy) {
-    case 'name':
-      return serversCopy.sort((a, b) => a.name.localeCompare(b.name));
-    case 'status':
-      return serversCopy.sort((a, b) => {
-        const statusA = a.isEnabled ? 1 : 0;
-        const statusB = b.isEnabled ? 1 : 0;
-        return statusB - statusA; // Enabled first
-      });
-    case 'stars':
-      return serversCopy.sort((a, b) => b.stargazer_count - a.stargazer_count);
-    default:
-      return serversCopy;
-  }
-};
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
 export default function ServerList({ view }: ServerListProps) {
   const dispatch = useAppDispatch();
   const servers = useAppSelector(selectAllServers);
-  console.log("🚀 ~ ServerList ~ servers:", servers)
   const searchQuery = useAppSelector(selectSearchQuery);
   const sortBy = useAppSelector(selectSortBy);
   const isLoadingFromStore = useAppSelector(selectServersLoading);
-  const { getServers, isLoading, isInstalled } = useMcpService();
+  const lastFetched = useAppSelector((state) => state.server.lastFetched);
+  const activeAgent = useActiveAgent();
+  const {
+    getServers,
+    getServersByAgent,
+    addServerByAgent,
+    removeServerByAgent,
+    isInstalled,
+  } = useMcpService();
+
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   // Memoized filtering
   const filteredServers = useMemo(() => {
@@ -67,23 +51,55 @@ export default function ServerList({ view }: ServerListProps) {
 
   useEffect(() => {
     const fetchServers = async () => {
-      if (!isInstalled) return;
-      
-      const result = await getServers();
-      console.log('🚀 ~ fetchServers ~ result:', result);
-      
-        const serversArray = Array.isArray(result) ? result : [];
-        dispatch(setServers(serversArray));
+      if (!isInstalled) {
+        setIsInitialLoading(false);
+        return;
+      }
+
+      const now = Date.now();
+      const isStale = !lastFetched || (now - lastFetched) > ONE_DAY_MS;
+
+      // Only show loader if we don't have cached data
+      if (servers.length === 0) {
+        setIsInitialLoading(true);
+      }
+
+      // Always fetch agent servers to check enabled status
+      const agentServers = await getServersByAgent(activeAgent?.agent || '');
+
+      // Only fetch all servers if data is stale
+      if (isStale || servers.length === 0) {
+        const result = await getServers();
+        const serversArray = result?.map((server: ServerData) => {
+          return {
+            ...server,
+            isEnabled: agentServers?.some(
+              (agentServer) => agentServer.name === server.name
+            ),
+          };
+        });
+        dispatch(setServers(serversArray || []));
+      } else {
+        // Update enabled status on cached servers
+        const updatedServers = servers.map((server) => ({
+          ...server,
+          isEnabled: agentServers?.some(
+            (agentServer) => agentServer.name === server.name
+          ),
+        }));
+        dispatch(setServers(updatedServers));
+      }
+
+      setIsInitialLoading(false);
     };
 
     fetchServers();
-  }, [isInstalled, dispatch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isInstalled, activeAgent?.agent]);
 
-  const handleToggle = (name: string) => {
-    dispatch(toggleServer(name));
-  };
+  
 
-  if (isLoading || isLoadingFromStore) {
+  if ((isInitialLoading || isLoadingFromStore) && servers.length === 0) {
     return (
       <div className="flex flex-1 items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -101,21 +117,19 @@ export default function ServerList({ view }: ServerListProps) {
         <div
           className={cn(
             'gap-4',
-            view === 'grid' ? 'grid grid-cols-1 lg:grid-cols-2' : 'flex flex-col'
+            view === 'grid'
+              ? 'grid grid-cols-1 lg:grid-cols-2'
+              : 'flex flex-col'
           )}
         >
           {sortedServers.map((server, index) => (
             <ServerCard
               key={Object.keys(server.mcp)[0] || server.name}
-              name={server.name}
-              description={server.description}
-              by={server.by}
-              stargazer_count={server.stargazer_count}
-              mcp={server.mcp}
-              isEnabled={server.isEnabled}
               view={view}
               index={index}
-              onToggle={() => handleToggle(server.name)}
+              server={server}
+              addServerByAgent={addServerByAgent}
+              removeServerByAgent={removeServerByAgent}
             />
           ))}
         </div>

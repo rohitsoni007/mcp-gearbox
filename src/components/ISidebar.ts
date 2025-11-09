@@ -1,10 +1,10 @@
-interface MenuItem {
+type MenuItem = {
   id: string;
   isActive: boolean;
   icon: React.ComponentType<{ className?: string }>;
 }
 
-interface SidebarProps {
+type SidebarProps = {
   menus: MenuItem[];
   onToggleAgentPanel: () => void;
   isAgentPanelOpen: boolean;

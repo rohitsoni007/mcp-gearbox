@@ -15,11 +15,13 @@ export interface Agent {
 interface AgentState {
   agents: Agent[];
   activeAgentId: string | null;
+  lastFetched: number | null;
 }
 
 const initialState: AgentState = {
   agents: [],
   activeAgentId: null,
+  lastFetched: null,
 };
 
 const agentSlice = createSlice({
@@ -28,6 +30,7 @@ const agentSlice = createSlice({
   reducers: {
     setAgents: (state, action: PayloadAction<Agent[]>) => {
       state.agents = action.payload;
+      state.lastFetched = Date.now();
     },
     setActiveAgent: (state, action: PayloadAction<string>) => {
       state.activeAgentId = action.payload;
