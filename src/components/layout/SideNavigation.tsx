@@ -3,8 +3,6 @@ import Sidebar from '../Sidebar';
 import AgentPanel from '../AgentPanel';
 import { menus } from '@/utils/constants';
 
-
-
 export default function SideNavigation() {
   const [isAgentPanelOpen, setIsAgentPanelOpen] = useState(true);
 

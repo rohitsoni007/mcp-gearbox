@@ -8,10 +8,7 @@ const Index = () => {
   return (
     <>
       {/* Header */}
-      <Header 
-        view={view} 
-        setView={setView} 
-      />
+      <Header view={view} setView={setView} />
 
       {/* Server Grid */}
       <ServerList view={view} />

@@ -17,7 +17,7 @@ import { filterServers, sortServers } from '@/utils/commonFunctions';
 
 type ServerListProps = {
   view: 'grid' | 'list';
-}
+};
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -27,7 +27,7 @@ export default function ServerList({ view }: ServerListProps) {
   const searchQuery = useAppSelector(selectSearchQuery);
   const sortBy = useAppSelector(selectSortBy);
   const isLoadingFromStore = useAppSelector(selectServersLoading);
-  const lastFetched = useAppSelector((state) => state.server.lastFetched);
+  const lastFetched = useAppSelector(state => state.server.lastFetched);
   const activeAgent = useActiveAgent();
   const {
     getServers,
@@ -57,15 +57,18 @@ export default function ServerList({ view }: ServerListProps) {
       }
 
       const now = Date.now();
-      const isStale = !lastFetched || (now - lastFetched) > ONE_DAY_MS;
+      const isStale = !lastFetched || now - lastFetched > ONE_DAY_MS;
 
       // Only show loader if we don't have cached data
       if (servers.length === 0) {
         setIsInitialLoading(true);
       }
 
-      // Always fetch agent servers to check enabled status
-      const agentServers = await getServersByAgent(activeAgent?.agent || '');
+      // Only fetch agent servers if activeAgent is available
+      let agentServers = null;
+      if (activeAgent?.agent) {
+        agentServers = await getServersByAgent(activeAgent.agent);
+      }
 
       // Only fetch all servers if data is stale
       if (isStale || servers.length === 0) {
@@ -74,17 +77,17 @@ export default function ServerList({ view }: ServerListProps) {
           return {
             ...server,
             isEnabled: agentServers?.some(
-              (agentServer) => agentServer.name === server.name
+              agentServer => agentServer.name === server.name
             ),
           };
         });
         dispatch(setServers(serversArray || []));
       } else {
         // Update enabled status on cached servers
-        const updatedServers = servers.map((server) => ({
+        const updatedServers = servers.map(server => ({
           ...server,
           isEnabled: agentServers?.some(
-            (agentServer) => agentServer.name === server.name
+            agentServer => agentServer.name === server.name
           ),
         }));
         dispatch(setServers(updatedServers));
@@ -96,8 +99,6 @@ export default function ServerList({ view }: ServerListProps) {
     fetchServers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInstalled, activeAgent?.agent]);
-
-  
 
   if ((isInitialLoading || isLoadingFromStore) && servers.length === 0) {
     return (

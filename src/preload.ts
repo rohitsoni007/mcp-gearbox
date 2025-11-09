@@ -6,7 +6,9 @@ import { McpIpcApi } from './types/electronMcp';
 
 const mcpApi: McpIpcApi = {
   isInstalled: () => ipcRenderer.invoke('mcp:is-installed'),
-  executeCommand: (args: string[]) => ipcRenderer.invoke('mcp:execute-command', args),
+  executeCommand: (args: string[]) =>
+    ipcRenderer.invoke('mcp:execute-command', args),
+  installCli: () => ipcRenderer.invoke('mcp:install-cli'),
 };
 
 contextBridge.exposeInMainWorld('mcpApi', mcpApi);

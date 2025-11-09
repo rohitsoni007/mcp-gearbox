@@ -2,7 +2,13 @@ export const getErrorMessage = (err: unknown): string => {
   return err instanceof Error ? err.message : 'Command execution failed';
 };
 
-export const filterServers = (servers: any[], query: string) => {
+import { ServerData } from '@/types/mcp';
+import { AgentData } from '@/types/mcp';
+
+export const filterServers = (
+  servers: ServerData[],
+  query: string
+): ServerData[] => {
   if (!Array.isArray(servers) || !query) return servers || [];
 
   const lowerQuery = query.toLowerCase().trim();
@@ -13,7 +19,10 @@ export const filterServers = (servers: any[], query: string) => {
   });
 };
 
-export const sortServers = (servers: any[], sortBy: string) => {
+export const sortServers = (
+  servers: ServerData[],
+  sortBy: string
+): ServerData[] => {
   if (!Array.isArray(servers)) return [];
 
   const serversCopy = [...servers];
@@ -22,7 +31,7 @@ export const sortServers = (servers: any[], sortBy: string) => {
     // First, sort by status (isEnabled) - enabled servers first
     const statusA = a.isEnabled ? 1 : 0;
     const statusB = b.isEnabled ? 1 : 0;
-    
+
     if (statusA !== statusB) {
       return statusB - statusA;
     }
@@ -46,9 +55,9 @@ export const formatStars = (count: number): string => {
   return count.toString();
 };
 
-export const sortAgents = (agents: any[]) => {
+export const sortAgents = (agents: AgentData[]): AgentData[] => {
   if (!Array.isArray(agents)) return [];
-  
+
   return [...agents].sort((a, b) => {
     if (a.installed === b.installed) {
       return a.name.localeCompare(b.name);

@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 export interface Server {
   name: string;
   description: string;
-  mcp: Record<string, any>;
+  mcp: Record<string, unknown>;
   stargazer_count: number;
   by: string;
   isEnabled?: boolean;
@@ -43,14 +43,14 @@ const serverSlice = createSlice({
       state.error = action.payload;
     },
     toggleServer: (state, action: PayloadAction<string>) => {
-      const server = state.servers.find((s) => s.name === action.payload);
+      const server = state.servers.find(s => s.name === action.payload);
       if (server) {
         server.isEnabled = !server.isEnabled;
       }
     },
     updateServer: (state, action: PayloadAction<Server>) => {
       const index = state.servers.findIndex(
-        (server) => server.name === action.payload.name
+        server => server.name === action.payload.name
       );
       if (index !== -1) {
         state.servers[index] = action.payload;
@@ -61,7 +61,7 @@ const serverSlice = createSlice({
     },
     removeServer: (state, action: PayloadAction<string>) => {
       state.servers = state.servers.filter(
-        (server) => server.name !== action.payload
+        server => server.name !== action.payload
       );
     },
     setSearchQuery: (state, action: PayloadAction<string>) => {

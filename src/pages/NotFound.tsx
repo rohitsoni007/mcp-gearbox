@@ -1,11 +1,14 @@
-import { useLocation } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useLocation } from '@tanstack/react-router';
+import { useEffect } from 'react';
 
 const NotFound = () => {
   const location = useLocation();
 
   useEffect(() => {
-    console.error("404 Error: User attempted to access non-existent route:", location.pathname);
+    console.error(
+      '404 Error: User attempted to access non-existent route:',
+      location.pathname
+    );
   }, [location.pathname]);
 
   return (

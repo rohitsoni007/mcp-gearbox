@@ -1,5 +1,3 @@
-
-
 // New interface for agent data based on the provided structure
 export interface AgentData {
   agent: string;
@@ -26,7 +24,7 @@ export interface AgentServer {
 export interface ServerData {
   name: string;
   description: string;
-  mcp: Record<string, any>;
+  mcp: Record<string, unknown>;
   stargazer_count: number;
   by: string;
   isEnabled?: boolean;

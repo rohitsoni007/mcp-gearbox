@@ -14,11 +14,11 @@ const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
 export default function AgentPanel({ isOpen }: AgentPanelProps) {
   const dispatch = useAppDispatch();
-  const agents = useAppSelector((state) => {
+  const agents = useAppSelector(state => {
     return state.agent.agents;
   });
-  const activeAgentId = useAppSelector((state) => state.agent.activeAgentId);
-  const lastFetched = useAppSelector((state) => state.agent.lastFetched);
+  const activeAgentId = useAppSelector(state => state.agent.activeAgentId);
+  const lastFetched = useAppSelector(state => state.agent.lastFetched);
   const { isInstalled, isLoading, error, getAgents } = useMcpService();
 
   const getAgentsData = useEffectEvent(async () => {
@@ -27,7 +27,7 @@ export default function AgentPanel({ isOpen }: AgentPanelProps) {
       const sortedAgents = sortAgents(fetchedAgents);
 
       dispatch(setAgents(sortedAgents));
-      
+
       // Set first agent as active if none selected
       if (!activeAgentId && sortedAgents.length > 0) {
         dispatch(setActiveAgent(sortedAgents[0].agent));
@@ -40,7 +40,7 @@ export default function AgentPanel({ isOpen }: AgentPanelProps) {
   };
 
   // Compute agents with active flag
-  const agentsWithActive = agents.map((agent) => ({
+  const agentsWithActive = agents.map(agent => ({
     ...agent,
     active: agent.agent === activeAgentId,
   }));
@@ -48,8 +48,8 @@ export default function AgentPanel({ isOpen }: AgentPanelProps) {
   useEffect(() => {
     if (isInstalled) {
       const now = Date.now();
-      const isStale = !lastFetched || (now - lastFetched) > ONE_DAY_MS;
-      
+      const isStale = !lastFetched || now - lastFetched > ONE_DAY_MS;
+
       // Only fetch if data is stale or doesn't exist
       if (isStale) {
         getAgentsData();
@@ -58,7 +58,14 @@ export default function AgentPanel({ isOpen }: AgentPanelProps) {
         dispatch(setActiveAgent(agents[0].agent));
       }
     }
-  }, [isInstalled]);
+  }, [
+    isInstalled,
+    lastFetched,
+    activeAgentId,
+    agents,
+    dispatch,
+    getAgentsData,
+  ]);
 
   return (
     <aside
@@ -103,15 +110,15 @@ export default function AgentPanel({ isOpen }: AgentPanelProps) {
             No agents found
           </div>
         )}
-        {agentsWithActive.map((agent: any) => (
+        {agentsWithActive.map(agent => (
           <button
             key={agent.agent}
             onClick={() => handleSelectAgent(agent.agent)}
             className={cn(
-              "flex items-center gap-3 rounded-xl px-4 py-3 text-left transition-all",
+              'flex items-center gap-3 rounded-xl px-4 py-3 text-left transition-all',
               agent.active
-                ? "bg-primary/20 text-foreground"
-                : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground"
+                ? 'bg-primary/20 text-foreground'
+                : 'text-muted-foreground hover:bg-sidebar-accent hover:text-foreground'
             )}
           >
             {/* <span className="text-2xl">{agent.icon}</span> */}

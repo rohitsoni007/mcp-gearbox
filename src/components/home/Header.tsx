@@ -7,11 +7,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import { useActiveAgent } from '@/hooks/useActiveAgent';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setSortBy } from '@/store/slices/serverSlice';
 import { selectSortBy } from '@/store/selectors/serverSelectors';
+import { useMcpService } from '@/hooks/useMcpService';
 import { useEffect, useState } from 'react';
+import { Download, Loader2 } from 'lucide-react';
 
 interface HeaderProps {
   view: 'grid' | 'list';
@@ -23,6 +26,7 @@ export default function Header({ view, setView }: HeaderProps) {
   const activeAgent = useActiveAgent();
   const reduxSortBy = useAppSelector(selectSortBy);
   const [localSortBy, setLocalSortBy] = useState(reduxSortBy);
+  const { isInstalled, isInstalling, installCli } = useMcpService();
 
   // Sync local state with Redux state
   useEffect(() => {
@@ -54,6 +58,26 @@ export default function Header({ view, setView }: HeaderProps) {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          {!isInstalled && !activeAgent && (
+            <Button
+              onClick={installCli}
+              disabled={isInstalling}
+              variant="default"
+              size="sm"
+            >
+              {isInstalling ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Installing...
+                </>
+              ) : (
+                <>
+                  <Download className="mr-2 h-4 w-4" />
+                  Install MCP CLI
+                </>
+              )}
+            </Button>
+          )}
           <div className="flex items-center gap-2 text-sm">
             <span className="text-muted-foreground">Sort by:</span>
             <Select value={localSortBy} onValueChange={handleSortChange}>

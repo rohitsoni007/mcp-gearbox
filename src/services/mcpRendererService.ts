@@ -5,7 +5,7 @@ export interface McpCommandResult {
   stderr: string;
 }
 
-export interface McpParsedResult<T = any> {
+export interface McpParsedResult<T = unknown> {
   success: boolean;
   data: T | null;
   error: string | null;
@@ -35,12 +35,32 @@ export class McpRendererService {
   }
 
   /**
+   * Install MCP CLI globally
+   */
+  static async installCli(): Promise<{
+    success: boolean;
+    stdout?: string;
+    stderr?: string;
+    error?: string;
+  }> {
+    try {
+      return await this.mcpApi.installCli();
+    } catch (error) {
+      console.error('Error installing MCP CLI:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  }
+
+  /**
    * Execute custom MCP CLI command and parse JSON result
    */
   static async executeCommand(args: string[]): Promise<McpParsedResult> {
     try {
       const result = await this.mcpApi.executeCommand(args);
-      
+
       if (result.code !== 0) {
         return {
           success: false,
@@ -76,7 +96,6 @@ export class McpRendererService {
    * Get servers by agent using MCP CLI
    */
   static async getServersByAgent(agent: string): Promise<McpParsedResult> {
-    console.log("🚀 ~ McpRendererService ~ getServersByAgent ~ agent:", agent)
     try {
       return await this.executeCommand(['list', '-a', agent, '-j']);
     } catch (error) {
@@ -146,4 +165,3 @@ export class McpRendererService {
     }
   }
 }
-

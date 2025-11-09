@@ -1,8 +1,8 @@
 {
-  "name": "electron-shadcn",
-  "productName": "electron-shadcn",
-  "version": "1.0.0",
-  "description": "Electron Forge with shadcn/ui (Vite + Typescript)",
+  "name": "mcp-gearbox",
+  "productName": "mcp-gearbox",
+  "version": "0.0.1",
+  "description": "A modern desktop application for managing Model Context Protocol (MCP) servers across multiple AI agents",
   "main": ".vite/build/main.js",
   "scripts": {
     "start": "electron-forge start",

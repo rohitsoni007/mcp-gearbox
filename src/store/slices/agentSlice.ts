@@ -37,7 +37,7 @@ const agentSlice = createSlice({
     },
     updateAgent: (state, action: PayloadAction<Agent>) => {
       const index = state.agents.findIndex(
-        (agent) => agent.agent === action.payload.agent
+        agent => agent.agent === action.payload.agent
       );
       if (index !== -1) {
         state.agents[index] = action.payload;

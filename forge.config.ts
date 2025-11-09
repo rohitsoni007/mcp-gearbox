@@ -10,14 +10,26 @@ import { FuseV1Options, FuseVersion } from '@electron/fuses';
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
-    executableName: 'electron-shadcn',
+    executableName: 'mcp-gearbox',
   },
   rebuildConfig: {},
   makers: [
-    new MakerSquirrel({}),
+    new MakerSquirrel({
+      name: 'mcp-gearbox',
+      setupExe: 'mcp-gearbox-setup.exe',
+      setupIcon: './assets/icon.ico',
+    }),
     new MakerZIP({}, ['darwin']),
-    new MakerRpm({}),
-    new MakerDeb({}),
+    new MakerRpm({
+      options: {
+        name: 'mcp-gearbox',
+      },
+    }),
+    new MakerDeb({
+      options: {
+        name: 'mcp-gearbox',
+      },
+    }),
   ],
   plugins: [
     new VitePlugin({

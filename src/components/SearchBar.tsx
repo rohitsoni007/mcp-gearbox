@@ -1,13 +1,12 @@
-import { Search } from "lucide-react";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { setSearchQuery } from "@/store/slices/serverSlice";
-import { selectSearchQuery } from "@/store/selectors/serverSelectors";
-import { useState, useEffect } from "react";
+import { Search } from 'lucide-react';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { setSearchQuery } from '@/store/slices/serverSlice';
+import { selectSearchQuery } from '@/store/selectors/serverSelectors';
+import { useState, useEffect } from 'react';
 
 export default function SearchBar() {
   const dispatch = useAppDispatch();
   const searchQuery = useAppSelector(selectSearchQuery);
-  console.log("🚀 ~ SearchBar ~ searchQuery:", searchQuery)
   const [localValue, setLocalValue] = useState(searchQuery);
 
   useEffect(() => {

@@ -1,11 +1,11 @@
-type MenuItem = {
+export type MenuItem = {
   id: string;
   isActive: boolean;
   icon: React.ComponentType<{ className?: string }>;
-}
+};
 
-type SidebarProps = {
+export type SidebarProps = {
   menus: MenuItem[];
   onToggleAgentPanel: () => void;
   isAgentPanelOpen: boolean;
-}
+};

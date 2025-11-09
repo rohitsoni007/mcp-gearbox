@@ -12,30 +12,29 @@ type ServerCardProps = {
   server: ServerData;
   view: 'grid' | 'list';
   index: number;
-  addServerByAgent: (agent: string, serverName: string) => Promise<any>
-  removeServerByAgent: (serverName: string, agent: string) => Promise<any>
-}
+  addServerByAgent: (agent: string, serverName: string) => Promise<unknown>;
+  removeServerByAgent: (serverName: string, agent: string) => Promise<unknown>;
+};
 
 export default function ServerCard({
   view,
   index,
   server,
   addServerByAgent,
-  removeServerByAgent
+  removeServerByAgent,
 }: ServerCardProps) {
   const { name, description, by, stargazer_count, isEnabled } = server;
   const [isToggling, setIsToggling] = useState(false);
 
   const activeAgent = useActiveAgent();
   const dispatch = useAppDispatch();
-  
+
   const onToggle = async () => {
     if (isToggling) return;
-    
+
     setIsToggling(true);
     try {
-      console.log('🚀 ~ handleToggle ~ name:', name);
-      if(isEnabled) {
+      if (isEnabled) {
         await removeServerByAgent(name.toLowerCase(), activeAgent?.agent || '');
       } else {
         await addServerByAgent(activeAgent?.agent || '', name.toLowerCase());
@@ -94,7 +93,11 @@ export default function ServerCard({
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Switch checked={isEnabled} onCheckedChange={onToggle} disabled={isToggling} />
+              <Switch
+                checked={isEnabled}
+                onCheckedChange={onToggle}
+                disabled={isToggling}
+              />
               <button className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
                 <MoreVertical className="h-4 w-4" />
               </button>
@@ -154,7 +157,11 @@ export default function ServerCard({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Switch checked={isEnabled} onCheckedChange={onToggle} disabled={isToggling} />
+          <Switch
+            checked={isEnabled}
+            onCheckedChange={onToggle}
+            disabled={isToggling}
+          />
           {/* <button className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
             <MoreVertical className="h-4 w-4" />
           </button> */}
