@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://rohitsoni007.github.io/mcp-gearbox/sitemap.xml
