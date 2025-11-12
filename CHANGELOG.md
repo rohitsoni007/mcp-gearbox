@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.2] - 2024-11-12
+- Copilot Support
+- Disable non installed ai agent & ui
+- server card status- starting stopping, in row 3 card ui
+- Title bar added by window controls
+- auto update cli version based on constant on start with uv or python dependency
+- Fix duplicate name issue & functionality
+- Fix sequential-thinking install failed issue
+- overall ui improvements
+- remove mcp start stop toast
+- reduce caching time to 2 minutes for regular update (from 24 hours)
+- improve ui performance
+
 
 ## [0.0.1] - 2024-11-09
 

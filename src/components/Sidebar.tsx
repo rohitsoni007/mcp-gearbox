@@ -19,7 +19,7 @@ export default function Sidebar({
   isAgentPanelOpen,
 }: SidebarProps) {
   return (
-    <nav className="glass-sidebar flex h-full flex-col justify-between p-2.5 w-20">
+    <nav className="glass-sidebar flex h-full flex-col justify-between p-2.5 w-15">
       <div className="flex flex-col items-center gap-4">
         <button
           onClick={onToggleAgentPanel}

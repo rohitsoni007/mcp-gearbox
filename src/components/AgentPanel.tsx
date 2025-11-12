@@ -1,16 +1,16 @@
-import { User, Loader2, AlertCircle } from 'lucide-react';
+import { Loader2, AlertCircle, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useMcpService } from '@/hooks/useMcpService';
 import { useEffect, useEffectEvent } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setAgents, setActiveAgent } from '@/store/slices/agentSlice';
 import { sortAgents } from '@/utils/commonFunctions';
+import { ONE_HOUR_MS } from '@/utils/constants';
 
 interface AgentPanelProps {
   isOpen: boolean;
 }
 
-const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
 export default function AgentPanel({ isOpen }: AgentPanelProps) {
   const dispatch = useAppDispatch();
@@ -48,7 +48,7 @@ export default function AgentPanel({ isOpen }: AgentPanelProps) {
   useEffect(() => {
     if (isInstalled) {
       const now = Date.now();
-      const isStale = !lastFetched || now - lastFetched > ONE_DAY_MS;
+      const isStale = !lastFetched || now - lastFetched > ONE_HOUR_MS;
 
       // Only fetch if data is stale or doesn't exist
       if (isStale) {
@@ -70,16 +70,16 @@ export default function AgentPanel({ isOpen }: AgentPanelProps) {
   return (
     <aside
       className={cn(
-        'glass-sidebar flex h-full flex-col p-6 transition-all duration-300 ease-in-out overflow-hidden',
-        isOpen ? 'w-50 opacity-100' : 'w-0 opacity-0 p-0'
+        'glass-sidebar flex h-full flex-col p-6 pl-1 pr-1 transition-all duration-300 ease-in-out overflow-hidden',
+        isOpen ? 'w-42 opacity-100' : 'w-0 opacity-0 p-0'
       )}
     >
       <div className="mb-6 flex items-center gap-3">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-          <User className="h-6 w-6" />
+        <div className="text-xxl flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+          <Sparkles className="h-6 w-6" />
         </div>
         <div>
-          <h2 className="text-sm font-semibold">Agents</h2>
+          <h2 className="text-sm font-semibold">AI Agents</h2>
           <p className="text-xs text-muted-foreground">Select an agent</p>
         </div>
       </div>
@@ -113,12 +113,16 @@ export default function AgentPanel({ isOpen }: AgentPanelProps) {
         {agentsWithActive.map(agent => (
           <button
             key={agent.agent}
-            onClick={() => handleSelectAgent(agent.agent)}
+            onClick={() => agent.installed && handleSelectAgent(agent.agent)}
+            disabled={!agent.installed}
             className={cn(
               'flex items-center gap-3 rounded-xl px-4 py-3 text-left transition-all',
-              agent.active
-                ? 'bg-primary/20 text-foreground'
-                : 'text-muted-foreground hover:bg-sidebar-accent hover:text-foreground'
+              agent.installed 
+                ? agent.active
+                  ? 'bg-primary/20 text-foreground'
+                  : 'text-muted-foreground hover:bg-sidebar-accent hover:text-foreground'
+                : 'text-muted-foreground/50',
+              agent.active && agent.installed && 'bg-primary/20 text-foreground'
             )}
           >
             {/* <span className="text-2xl">{agent.icon}</span> */}

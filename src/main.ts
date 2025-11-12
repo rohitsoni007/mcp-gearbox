@@ -13,8 +13,22 @@ const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
-    autoHideMenuBar: true, // 👈 hides the menubar
-    title: 'MCP Gearbox',
+    ...(process.platform === 'darwin' ? {
+      frame: true
+    } : {
+      frame: false
+    }),
+    titleBarStyle: "hidden", // hides title bar but keeps shadow and window controls space
+    autoHideMenuBar: true,  // hides menu bar (like VS Code)
+    // expose window controls in Windows/Linux
+    // ...(process.platform !== 'darwin' ? { titleBarOverlay: true } : {}),
+    ...(process.platform !== 'darwin' ? {
+      titleBarOverlay: {
+        color: '#293f3f',
+        symbolColor: '#cee4e8',
+        height: 30
+    },
+    } : {}),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,

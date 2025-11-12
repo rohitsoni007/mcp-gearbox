@@ -10,6 +10,12 @@
 [![Electron](https://img.shields.io/badge/Electron-39.0.0-47848F?logo=electron)](https://www.electronjs.org/)
 [![React](https://img.shields.io/badge/React-19.2.0-61DAFB?logo=react)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+[![GitHub Stars](https://img.shields.io/github/stars/rohitsoni007/mcp-gearbox?style=social)](https://github.com/rohitsoni007/mcp-gearbox)
+
+
+## Documentation
+
+For detailed usage instructions, please visit our [documentation](https://rohitsoni007.github.io/mcp-gearbox).
 
 ## What is MCP Gearbox?
 
@@ -90,9 +96,17 @@ npm run make
 
 ### Supported AI Agents
 
-- Claude Desktop
-- Kiro
-- Other MCP-compatible agents
+| Agent | Support | Notes |
+|-------|---------|-------|
+| **[GitHub Copilot](https://code.visualstudio.com)** | ✅ |  |
+| **[Continue](https://github.com/continuedev/continue)** | ✅ |  |
+| **[Kiro](https://kiro.dev)** | ✅ |  |
+| **[Cursor](https://cursor.sh)** | ✅ |  |
+| **[Claude Code](https://www.claude.com/product/claude-code)** | ✅ |  |
+| **[Gemini CLI](https://github.com/google-gemini/gemini-cli)** | ✅ |  |
+| **[Qoder](https://qoder.com)** | ✅ |  |
+| **[Copilot CLI](https://github.com/github/copilot-cli)** | ✅ |  |
+| **[LM Studio](https://lmstudio.ai)** | ✅ |  |
 
 ## Technology Stack
 

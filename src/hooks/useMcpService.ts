@@ -4,11 +4,13 @@ import {
   McpParsedResult,
 } from '@/services/mcpRendererService';
 import { useToast } from '@/hooks/use-toast';
-import { getErrorMessage } from '@/utils/commonFunctions';
+import { getErrorMessage, compareVersions } from '@/utils/commonFunctions';
 import { AgentData, AgentServer, ServerData } from '@/types/mcp';
+import { CLI_VERSION } from '@/utils/constants';
 
 export const useMcpService = () => {
   const [isInstalled, setIsInstalled] = useState(false);
+  const [version, setVersion] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isInstalling, setIsInstalling] = useState(false);
@@ -46,7 +48,7 @@ export const useMcpService = () => {
   const executeWithInstallCheck = async <T>(
     operation: () => Promise<McpParsedResult>,
     errorTitle: string,
-    successMessage?: { title: string; description: string }
+    _successMessage?: { title: string; description: string }
   ): Promise<T | null> => {
     if (!isInstalled) {
       showNotInstalledToast();
@@ -62,9 +64,7 @@ export const useMcpService = () => {
         showErrorToast(errorTitle, result.error || errorTitle);
         return null;
       }
-      if (successMessage) {
-        showSuccessToast(successMessage.title, successMessage.description);
-      }
+      
       return result.data as T;
     } catch (err) {
       handleError(err, errorTitle);
@@ -118,8 +118,26 @@ export const useMcpService = () => {
       const installed = await McpRendererService.isInstalled();
       setIsInstalled(installed);
 
+      // If CLI is installed, check version
+      if (installed) {
+        const currentVersion = await McpRendererService.getVersion();
+        if (currentVersion.success && typeof currentVersion.data === 'string') {
+          const currentVersionStr = currentVersion.data.trim();
+          // Compare versions: if CLI_VERSION > currentVersion, install new version
+          if (compareVersions(CLI_VERSION, currentVersionStr) > 0) {
+            toast({
+              title: 'New version available',
+              description: `Updating MCP CLI from ${currentVersionStr} to ${CLI_VERSION}`,
+            });
+            const installSuccess = await installCli();
+            if (!installSuccess) {
+              setError('Failed to update MCP CLI to the latest version.');
+            }
+          }
+        }
+      } 
       // Auto-install on first run if not installed
-      if (!installed) {
+      else {
         const installAttempted = localStorage.getItem('mcp-install-attempted');
         if (!installAttempted) {
           localStorage.setItem('mcp-install-attempted', 'true');
@@ -127,8 +145,6 @@ export const useMcpService = () => {
           if (!installSuccess) {
             setError('MCP CLI is not installed. Please install it manually.');
           }
-        } else {
-          setError('MCP CLI is not installed. Please install it first.');
         }
       }
     } catch (err) {
@@ -202,10 +218,28 @@ export const useMcpService = () => {
     );
   };
 
+  const getVersion = async (): Promise<unknown> => {
+    const result = await executeWithInstallCheck<unknown>(
+      () => McpRendererService.getVersion(),
+      'Failed to get version',
+      {
+        title: 'Server version',
+        description: 'Successfully got the version',
+      }
+    );
+    setVersion(result as string | null)
+    return result;
+  };
+
   useEffect(() => {
     checkInstallation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [version]);
+
+  useEffect(() => {
+    getVersion();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isInstalled]);
 
   return {
     isInstalled,

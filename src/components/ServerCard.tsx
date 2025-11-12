@@ -45,7 +45,7 @@ export default function ServerCard({
     }
   };
 
-  const status = isToggling ? 'restarting' : isEnabled ? 'online' : 'offline';
+  const status = isToggling ? (isEnabled ? 'stopping' : 'starting') : isEnabled ? 'online' : 'offline';
   const animationDelay = `${index * 100}ms`;
 
   if (view === 'list') {
@@ -71,7 +71,7 @@ export default function ServerCard({
                   'status-dot',
                   status === 'online' && 'bg-status-online',
                   status === 'offline' && 'bg-status-offline',
-                  status === 'restarting' && 'bg-status-restarting'
+                  (status === 'starting' || status === 'stopping') && 'bg-status-restarting'
                 )}
               />
               <span
@@ -79,7 +79,7 @@ export default function ServerCard({
                   'text-xs font-medium capitalize',
                   status === 'online' && 'text-status-online',
                   status === 'offline' && 'text-status-offline',
-                  status === 'restarting' && 'text-status-restarting'
+                  (status === 'starting' || status === 'stopping') && 'text-status-restarting'
                 )}
               >
                 {status}
@@ -129,7 +129,7 @@ export default function ServerCard({
                 'status-dot',
                 status === 'online' && 'bg-status-online',
                 status === 'offline' && 'bg-status-offline',
-                status === 'restarting' && 'bg-status-restarting'
+                (status === 'starting' || status === 'stopping') && 'bg-status-restarting'
               )}
             />
             <span
@@ -137,7 +137,7 @@ export default function ServerCard({
                 'text-xs font-medium capitalize',
                 status === 'online' && 'text-status-online',
                 status === 'offline' && 'text-status-offline',
-                status === 'restarting' && 'text-status-restarting'
+                (status === 'starting' || status === 'stopping') && 'text-status-restarting'
               )}
             >
               {status}
@@ -146,7 +146,9 @@ export default function ServerCard({
         </div>
       </div>
 
-      <p className="mb-4 text-sm text-muted-foreground">{description}</p>
+      <p className="mb-4 text-sm text-muted-foreground line-clamp-2">
+        {description}
+      </p>
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4 text-xs text-muted-foreground">

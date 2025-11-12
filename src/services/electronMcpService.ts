@@ -3,10 +3,11 @@
 
 import { ipcMain } from 'electron';
 import { executeMcpCli, isMcpCliInstalled } from 'mcp-gearbox';
-import { exec } from 'child_process';
-import { promisify } from 'util';
+import { installMcpCli } from './install';
+// import { exec } from 'child_process';
+// import { promisify } from 'util';
 
-const execAsync = promisify(exec);
+// const execAsync = promisify(exec);
 
 export class ElectronMcpService {
   static setupIpcHandlers() {
@@ -34,14 +35,15 @@ export class ElectronMcpService {
     ipcMain.handle('mcp:install-cli', async () => {
       try {
         console.log('Installing mcp-gearbox globally...');
-        const { stdout, stderr } = await execAsync(
-          'npm install -g mcp-gearbox'
-        );
-        console.log('Installation output:', stdout);
-        if (stderr) {
-          console.error('Installation stderr:', stderr);
-        }
-        return { success: true, stdout, stderr };
+        await installMcpCli();
+        // const { stdout, stderr } = await execAsync(
+        //   'npm install -g mcp-gearbox@latest'
+        // );
+        // console.log('Installation output:', stdout);
+        // if (stderr) {
+        //   console.error('Installation stderr:', stderr);
+        // }
+        return { success: true, stdout: true, stderr: false };
       } catch (error) {
         console.error('Error installing mcp-gearbox:', error);
         return {

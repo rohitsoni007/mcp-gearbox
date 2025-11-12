@@ -164,4 +164,24 @@ export class McpRendererService {
       throw error;
     }
   }
+
+  /**
+   * Get version using MCP CLI
+   */
+  static async getVersion(): Promise<McpParsedResult> {
+    try {
+      const result = await this.mcpApi.executeCommand(['-v']);
+      return {
+          success: true,
+          data: result.stdout,
+          error: null,
+          raw: result,
+        };
+    } catch (error) {
+      console.error('Error getting version:', error);
+      throw error;
+    }
+  }
+
+  
 }

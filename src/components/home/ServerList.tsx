@@ -14,12 +14,12 @@ import {
 import { useActiveAgent } from '@/hooks/useActiveAgent';
 import { ServerData } from '@/types/mcp';
 import { filterServers, sortServers } from '@/utils/commonFunctions';
+import { ONE_HOUR_MS } from '@/utils/constants';
 
 type ServerListProps = {
   view: 'grid' | 'list';
 };
 
-const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
 export default function ServerList({ view }: ServerListProps) {
   const dispatch = useAppDispatch();
@@ -57,7 +57,7 @@ export default function ServerList({ view }: ServerListProps) {
       }
 
       const now = Date.now();
-      const isStale = !lastFetched || now - lastFetched > ONE_DAY_MS;
+      const isStale = !lastFetched || now - lastFetched > ONE_HOUR_MS;
 
       // Only show loader if we don't have cached data
       if (servers.length === 0) {
@@ -119,7 +119,7 @@ export default function ServerList({ view }: ServerListProps) {
           className={cn(
             'gap-4',
             view === 'grid'
-              ? 'grid grid-cols-1 lg:grid-cols-2'
+              ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
               : 'flex flex-col'
           )}
         >
