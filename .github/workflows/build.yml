@@ -4,6 +4,9 @@ on:
   push:
     branches: [ main ]
     tags: [ 'v*' ]
+    paths:
+      - 'src/**'
+      - '.github/workflows/**'
   workflow_dispatch:
     inputs:
       create_release:

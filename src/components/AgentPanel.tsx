@@ -22,7 +22,7 @@ export default function AgentPanel({ isOpen }: AgentPanelProps) {
   const { isInstalled, isLoading, error, getAgents } = useMcpService();
 
   const getAgentsData = useEffectEvent(async () => {
-    const fetchedAgents = await getAgents();
+    const fetchedAgents = await getAgents(false); // Don't show toast on initial load
     if (fetchedAgents) {
       const sortedAgents = sortAgents(fetchedAgents);
 
