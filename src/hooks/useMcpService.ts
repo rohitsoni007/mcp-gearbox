@@ -16,12 +16,14 @@ export const useMcpService = () => {
   const [isInstalling, setIsInstalling] = useState(false);
   const { toast } = useToast();
 
-  const showNotInstalledToast = () => {
-    toast({
-      title: 'MCP CLI not installed',
-      description: 'Please install MCP CLI first.',
-      variant: 'destructive',
-    });
+  const showNotInstalledToast = (showToast: boolean = true) => {
+    if (showToast) {
+      toast({
+        title: 'MCP CLI not installed',
+        description: 'Please install MCP CLI first.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const showErrorToast = (title: string, description: string) => {
@@ -48,10 +50,11 @@ export const useMcpService = () => {
   const executeWithInstallCheck = async <T>(
     operation: () => Promise<McpParsedResult>,
     errorTitle: string,
-    _successMessage?: { title: string; description: string }
+    _successMessage?: { title: string; description: string },
+    showToast: boolean = true
   ): Promise<T | null> => {
     if (!isInstalled) {
-      showNotInstalledToast();
+      showNotInstalledToast(showToast);
       return null;
     }
 
@@ -111,7 +114,7 @@ export const useMcpService = () => {
     }
   };
 
-  const checkInstallation = async () => {
+  const checkInstallation = async (showToast: boolean = true) => {
     setIsLoading(true);
     setError(null);
     try {
@@ -142,7 +145,7 @@ export const useMcpService = () => {
         if (!installAttempted) {
           localStorage.setItem('mcp-install-attempted', 'true');
           const installSuccess = await installCli();
-          if (!installSuccess) {
+          if (!installSuccess && showToast) {
             setError('MCP CLI is not installed. Please install it manually.');
           }
         }
@@ -157,42 +160,53 @@ export const useMcpService = () => {
   };
 
   const executeCommand = async (
-    args: string[]
+    args: string[],
+    showToast: boolean = true
   ): Promise<McpParsedResult | null> => {
     return executeWithInstallCheck<McpParsedResult>(
       () => McpRendererService.executeCommand(args),
-      'Command failed'
+      'Command failed',
+      undefined,
+      showToast
     );
   };
 
-  const getAgents = async (): Promise<AgentData[]> => {
+  const getAgents = async (showToast: boolean = true): Promise<AgentData[]> => {
     const result = await executeWithInstallCheck<{ agents: AgentData[] }>(
       () => McpRendererService.getAgents(),
-      'Failed to get agents'
+      'Failed to get agents',
+      undefined,
+      showToast
     );
     return result?.agents || [];
   };
 
-  const getServers = async (): Promise<ServerData[] | null> => {
+  const getServers = async (showToast: boolean = true): Promise<ServerData[] | null> => {
     return executeWithInstallCheck<ServerData[]>(
       () => McpRendererService.getServers(),
-      'Failed to get servers'
+      'Failed to get servers',
+      undefined,
+      showToast
     );
   };
 
   const getServersByAgent = async (
-    agent: string
+    agent: string,
+    showToast: boolean = true
   ): Promise<AgentServer[] | null> => {
     const result = await executeWithInstallCheck<{ servers: AgentServer[] }>(
       () => McpRendererService.getServersByAgent(agent),
-      'Failed to get servers by agent'
+      'Failed to get servers by agent',
+      undefined,
+      showToast
     );
     return result?.servers || [];
   };
 
   const addServerByAgent = async (
     agent: string,
-    serverName: string
+    serverName: string,
+    showToast: boolean = true
   ): Promise<unknown> => {
     return executeWithInstallCheck<unknown>(
       () => McpRendererService.addServerByAgent(agent, serverName),
@@ -200,13 +214,15 @@ export const useMcpService = () => {
       {
         title: 'Server added',
         description: `Successfully added ${serverName} to ${agent}`,
-      }
+      },
+      showToast
     );
   };
 
   const removeServerByAgent = async (
     serverName: string,
-    agent: string
+    agent: string,
+    showToast: boolean = true
   ): Promise<unknown> => {
     return executeWithInstallCheck<unknown>(
       () => McpRendererService.removeServerByAgent(serverName, agent),
@@ -214,30 +230,32 @@ export const useMcpService = () => {
       {
         title: 'Server removed',
         description: `Successfully removed ${serverName} from ${agent}`,
-      }
+      },
+      showToast
     );
   };
 
-  const getVersion = async (): Promise<unknown> => {
+  const getVersion = async (showToast: boolean = true): Promise<unknown> => {
     const result = await executeWithInstallCheck<unknown>(
       () => McpRendererService.getVersion(),
       'Failed to get version',
       {
         title: 'Server version',
         description: 'Successfully got the version',
-      }
+      },
+      showToast
     );
     setVersion(result as string | null)
     return result;
   };
 
   useEffect(() => {
-    checkInstallation();
+    checkInstallation(false); // Don't show toast on initial check
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [version]);
 
   useEffect(() => {
-    getVersion();
+    getVersion(false); // Don't show toast on initial version check
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInstalled]);
 
