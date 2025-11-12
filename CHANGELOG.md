@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [0.0.2] - 2024-11-12
-- Copilot Support
+- Copilot CLI Support
 - Disable non installed ai agent & ui
 - server card status- starting stopping, in row 3 card ui
 - Title bar added by window controls
