@@ -1,7 +1,7 @@
 {
   "name": "mcp-gearbox",
   "productName": "mcp-gearbox",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A modern desktop application for managing Model Context Protocol (MCP) servers across multiple AI agents",
   "main": ".vite/build/main.js",
   "scripts": {
