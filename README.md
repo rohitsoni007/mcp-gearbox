@@ -6,6 +6,7 @@
 
 ![MCP Gearbox](media/mcp-gearbox.png)
 
+[![Build](https://github.com/rohitsoni007/mcp-gearbox/actions/workflows/build.yml/badge.svg)](https://github.com/rohitsoni007/mcp-gearbox/actions/workflows/build.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Electron](https://img.shields.io/badge/Electron-39.0.0-47848F?logo=electron)](https://www.electronjs.org/)
 [![React](https://img.shields.io/badge/React-19.2.0-61DAFB?logo=react)](https://reactjs.org/)
@@ -13,15 +14,17 @@
 [![GitHub Stars](https://img.shields.io/github/stars/rohitsoni007/mcp-gearbox?style=social)](https://github.com/rohitsoni007/mcp-gearbox)
 
 
-## Documentation
+## 📚 Documentation
 
 For detailed usage instructions, please visit our [documentation](https://rohitsoni007.github.io/mcp-gearbox).
 
-## What is MCP Gearbox?
+## 🤔 What is MCP Gearbox?
 
-MCP Gearbox is a powerful desktop application that simplifies the management of Model Context Protocol (MCP) servers for AI agents like Claude, Kiro, and others. Built with Electron, React, and TypeScript, it provides an intuitive interface to discover, install, configure, and manage MCP servers without touching configuration files.
+MCP Gearbox is a powerful cross-platform desktop application that simplifies the management of Model Context Protocol (MCP) servers for AI agents like Claude, Kiro, Continue, Copilot, Cursor, Qoder, and others. Built with Electron, React, and TypeScript, this productivity tool provides an intuitive interface to discover, install, configure, and manage MCP servers without touching configuration files. Whether you're a developer, researcher, or AI enthusiast, MCP Gearbox streamlines your workflow with local AI integration and server management capabilities.
 
 ### Key Features
+
+As a cutting-edge productivity tool for AI development, MCP Gearbox offers:
 
 - **🔍 Server Discovery** - Browse and search through available MCP servers from the community
 - **⚡ One-Click Installation** - Install MCP servers to your AI agents with a single click
@@ -31,23 +34,26 @@ MCP Gearbox is a powerful desktop application that simplifies the management of 
 - **🎨 Modern UI** - Built with shadcn/ui components and Tailwind CSS for a beautiful experience
 - **💾 State Persistence** - Your settings and preferences are saved automatically
 
-## Why MCP Gearbox?
+These features make MCP Gearbox the ultimate productivity tool for developers working with AI assistants.
 
-Managing MCP servers manually can be tedious and error-prone. MCP Gearbox eliminates the complexity by:
+## 💡 Why MCP Gearbox?
 
-- Providing a visual interface for server management
-- Automating configuration file updates
-- Offering server discovery and recommendations
-- Supporting multiple AI agents in one place
-- Reducing setup time from minutes to seconds
+Managing MCP servers manually can be tedious and error-prone. MCP Gearbox eliminates the complexity by offering a code assistant productivity tool that:
 
-## Installation
+- Provides a visual interface for server management
+- Automates configuration file updates
+- Offers server discovery and recommendations
+- Supports multiple AI agents in one place
+- Reduces setup time from minutes to seconds
+
+This AI integration tool transforms how developers and researchers work with Model Context Protocol servers, making local AI setup effortless and efficient.
+
+## 💻 Installation
+
+Get started with this AI integration tool in minutes. MCP Gearbox supports all major operating systems.
 
 ## 🔧 Requirements
 
-- **Node.js 18 or higher**
-- **npm package manager**
-- **Linux/macOS/Windows**
 - [uv](https://docs.astral.sh/uv/) for package management
 - [Python 3.11+](https://www.python.org/downloads/)
 - [Git](https://git-scm.com/downloads)
@@ -55,13 +61,17 @@ Managing MCP servers manually can be tedious and error-prone. MCP Gearbox elimin
 
 ### Download
 
-Download the latest release for your platform:
+Get started immediately with our pre-built binaries for maximum convenience:
 
 - **Windows**: `mcp-gearbox-setup.exe`
 - **macOS**: `mcp-gearbox.dmg`
 - **Linux**: `mcp-gearbox.deb` or `mcp-gearbox.rpm`
 
-### Build from Source
+This cross-platform AI integration tool is ready to enhance your productivity workflow.
+
+### 🛠️ Build from Source
+
+Build this productivity tool from source to customize it for your specific needs:
 
 ```bash
 # Clone the repository
@@ -78,9 +88,13 @@ npm start
 npm run make
 ```
 
-## Usage
+Building from source gives you the flexibility to extend MCP Gearbox as an AI integration tool.
 
-### Getting Started
+## 🎯 Usage
+
+Unlock the full potential of this productivity tool with these simple steps:
+
+### 🚀 Getting Started
 
 1. **Launch MCP Gearbox** - Open the application
 2. **Check Agent Status** - View which AI agents are installed and configured
@@ -88,13 +102,21 @@ npm run make
 4. **Install Servers** - Click to add servers to your preferred agents
 5. **Manage Configuration** - Enable/disable servers as needed
 
-### Managing Servers
+This intuitive workflow makes managing AI assistants effortless.
+
+### 🖥️ Managing Servers
+
+Effortlessly control your AI assistant ecosystem with these management features:
 
 - **Add a Server**: Browse the server list and click "Install" on any server
 - **Remove a Server**: Navigate to your installed servers and click "Remove"
 - **Enable/Disable**: Toggle servers on or off without uninstalling
 
-### Supported AI Agents
+This server management capability makes MCP Gearbox the ultimate productivity tool for AI development.
+
+### 🤖 Supported AI Agents
+
+MCP Gearbox seamlessly integrates with popular AI code assistants and development tools:
 
 | Agent | Support | Notes |
 |-------|---------|-------|
@@ -108,7 +130,7 @@ npm run make
 | **[Copilot CLI](https://github.com/github/copilot-cli)** | ✅ |  |
 | **[LM Studio](https://lmstudio.ai)** | ✅ |  |
 
-## Technology Stack
+## ⚙️ Technology Stack
 
 - **Framework**: Electron 39 with Electron Forge
 - **Frontend**: React 19 with TypeScript
@@ -121,7 +143,11 @@ npm run make
 
 ## Development
 
-### Project Structure
+Join us in improving this AI integration tool for the developer community. We use modern development practices to ensure code quality and maintainability.
+
+### 📁 Project Structure
+
+Our well-organized codebase follows modern development practices for this productivity tool:
 
 ```
 mcp-gearbox/
@@ -140,7 +166,11 @@ mcp-gearbox/
 └── forge.config.ts     # Electron Forge configuration
 ```
 
-### Available Scripts
+This modular structure makes MCP Gearbox easy to understand and extend as an AI integration tool.
+
+### 📜 Available Scripts
+
+Streamline your development workflow with these npm scripts for this AI integration tool:
 
 ```bash
 npm start              # Start development server
@@ -152,7 +182,11 @@ npm test               # Run unit tests
 npm run test:e2e       # Run end-to-end tests
 ```
 
-### Testing
+These scripts ensure consistent development practices for contributing to this productivity tool.
+
+### 🧪 Testing
+
+We maintain high quality standards for this productivity tool through comprehensive testing:
 
 ```bash
 # Unit tests with Vitest
@@ -165,9 +199,13 @@ npm run test:e2e
 npm run test:e2e:ui
 ```
 
-## Contributing
+Our testing approach ensures MCP Gearbox remains a reliable AI integration tool for developers.
 
-We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for details on:
+We follow best practices for testing to ensure MCP Gearbox remains a reliable productivity tool.
+
+## 🤝 Contributing
+
+We welcome contributions from the AI development community! Whether you're a seasoned developer or new to AI tools, your input helps make MCP Gearbox better for everyone. Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for details on:
 
 - Code of Conduct
 - Development setup
@@ -175,16 +213,24 @@ We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for 
 - Reporting issues
 - Coding standards
 
-## License
+Join us in building the ultimate productivity tool for AI assistant management.
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## 📄 License
 
-## Support
+This open-source productivity tool is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. The permissive MIT license allows you to use, modify, and distribute MCP Gearbox for both personal and commercial projects.
 
-- **Issues**: [GitHub Issues](https://github.com/rohitsoni007/mcp-gearbox/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/rohitsoni007/mcp-gearbox/discussions)
+## 💬 Support
 
-## Roadmap
+Need help with this AI integration tool or have questions about managing MCP servers? We're here to help:
+
+- **Issues**: [GitHub Issues](https://github.com/rohitsoni007/mcp-gearbox/issues) - Report bugs or request features
+- **Discussions**: [GitHub Discussions](https://github.com/rohitsoni007/mcp-gearbox/discussions) - Ask questions and connect with other users
+
+As a productivity tool for AI developers, we strive to provide excellent support for our community.
+
+## 🗺️ Roadmap
+
+Our future plans for enhancing this AI integration tool include:
 
 - [ ] Server configuration editor
 - [ ] Custom server addition
@@ -193,13 +239,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [ ] Dark/light theme toggle
 - [ ] Multi-language support
 
-## Acknowledgments
+## 🙏 Acknowledgements
 
-- Built with [Electron Forge](https://www.electronforge.io/)
-- UI components from [shadcn/ui](https://ui.shadcn.com/)
-- Icons from [Lucide](https://lucide.dev/)
-- Inspired by the MCP community
+This project is based on the data from [Model Context Protocol Servers](https://github.com/modelcontextprotocol/servers) and [Github MCP Registry](https://github.com/mcp).
+This project uses my other project  [MCP-Gearbox-CLI](https://github.com/rohitsoni007/mcp-gearbox-cli).
+
+We're continuously working to improve MCP Gearbox as a productivity tool for the AI development community.
 
 ---
 
-**Keywords**: MCP, Model Context Protocol, AI agents, Claude Desktop, Kiro, Electron app, server management, AI tools, desktop application, TypeScript, React, MCP servers, AI configuration, developer tools
+**Keywords**: MCP, Model Context Protocol, AI agents, Claude Desktop, Kiro, Electron app, server management, AI tools, desktop application, TypeScript, React, MCP servers, AI configuration, developer tools, AI assistant, local AI, MCP client, AI integration, code assistant, productivity tool, cross-platform app
