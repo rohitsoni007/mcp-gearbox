@@ -11,6 +11,7 @@ const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
     executableName: 'mcp-gearbox',
+    extraResource: ['./public'], // Include public folder in the package
   },
   rebuildConfig: {},
   makers: [

@@ -8,6 +8,12 @@ import Kiro from './AgentSVG/Kiro';
 import Copilot from './AgentSVG/Copilot';
 import CopilotCLI from './AgentSVG/CopilotCLI';
 
+// Import icons as modules to ensure they're handled by Vite
+import geminiIcon from '/icons/gemini.png';
+import cursorIcon from '/icons/cursor.png';
+import qoderIcon from '/icons/qoder.png';
+import lmstudioIcon from '/icons/lmstudio.webp';
+
 interface AgentProps {
   agent: Agent;
 }
@@ -27,19 +33,19 @@ function getAgentIcon(agent: Agent) {
       return <Copilot />;
     case 'gemini':
       return (
-        <img src="/icons/gemini.png" alt={agent.name} className={ImgClass} />
+        <img src={geminiIcon} alt={agent.name} className={ImgClass} />
       );
     case 'cursor':
       return (
-        <img src="/icons/cursor.png" alt={agent.name} className={ImgClass} />
+        <img src={cursorIcon} alt={agent.name} className={ImgClass} />
       );
     case 'qoder':
       return (
-        <img src="/icons/qoder.png" alt={agent.name} className={ImgClass} />
+        <img src={qoderIcon} alt={agent.name} className={ImgClass} />
       );
     case 'lmstudio':
       return (
-        <img src="/icons/lmstudio.webp" alt={agent.name} className={ImgClass} />
+        <img src={lmstudioIcon} alt={agent.name} className={ImgClass} />
       );
     default:
       return <span className="text-2xl">🤖</span>;

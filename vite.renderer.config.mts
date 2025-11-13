@@ -26,4 +26,10 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    rollupOptions: {
+      external: [], // Ensure no assets are treated as external
+    },
+  },
+  publicDir: path.resolve(__dirname, 'public'), // Explicitly set public directory
 });
