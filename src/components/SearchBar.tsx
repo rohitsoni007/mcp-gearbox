@@ -107,7 +107,7 @@ export default function SearchBar() {
 
   return (
     <div className="w-full">
-      <div className="flex items-center gap-4 mb-4">
+      <div className="flex items-center gap-4 mb-2">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
           <input
@@ -115,54 +115,51 @@ export default function SearchBar() {
             placeholder="Search servers by name or author"
             value={localValue}
             onChange={handleSearchChange}
-            className="glass-card h-12 w-full rounded-xl pl-12 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            className="glass-card h-10 w-full rounded-xl pl-12 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           />
         </div>
 
         <div className="flex items-center space-x-2">
-          <Label htmlFor="project-level-spec">
-            Project Level Configuration
-          </Label>
+          <Label htmlFor="project-level-spec">Project Level</Label>
           <Switch
             id="project-level-spec"
             checked={isProjectLevelSpecEnabled}
             onCheckedChange={handleProjectLevelSpecToggle}
           />
         </div>
+        {isProjectLevelSpecEnabled && (
+          <div className="flex items-center gap-2">
+            <div className="flex-1">
+              <Input
+                type="text"
+                placeholder="Project location"
+                value={localProjectLocation}
+                onChange={handleProjectLocationChange}
+                onBlur={handleProjectLocationBlur}
+                className="h-10"
+                readOnly
+              />
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={handleSelectProjectLocation}
+              className="cursor-pointer"
+            >
+              <FolderOpen className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
         {isProjectLevelSpecEnabled && unsupportedAgent && (
           <>
             <AlertCircle className="h-4 w-4 text-yellow-500" />
             <span className="text-sm text-yellow-500">
-              {activeAgent?.name} does not support project-level MCP
-              configuration
+              {activeAgent?.name} not support project-level MCP
             </span>
           </>
         )}
       </div>
-
-      {isProjectLevelSpecEnabled && (
-        <div className="flex items-center gap-2">
-          <div className="flex-1">
-            <Input
-              type="text"
-              placeholder="Project location"
-              value={localProjectLocation}
-              onChange={handleProjectLocationChange}
-              onBlur={handleProjectLocationBlur}
-              className="h-10"
-              readOnly
-            />
-          </div>
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={handleSelectProjectLocation}
-          >
-            <FolderOpen className="h-4 w-4" />
-          </Button>
-        </div>
-      )}
     </div>
   );
 }

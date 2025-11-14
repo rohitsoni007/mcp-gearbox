@@ -25,6 +25,7 @@ export default function AgentPanel({ isOpen }: AgentPanelProps) {
 
   const getAgentsData = useCallback(async () => {
     try {
+      setIsInitialLoading(true);
       const fetchedAgents = await getAgents(false); // Don't show toast on initial load
       if (fetchedAgents) {
         const sortedAgents = sortAgents(fetchedAgents);
@@ -36,6 +37,7 @@ export default function AgentPanel({ isOpen }: AgentPanelProps) {
           await dispatch(setActiveAgent(sortedAgents[0].agent));
         }
       }
+      setIsInitialLoading(false);
     } catch (error) {
       console.error('Error fetching agents:', error);
     } finally {
@@ -63,7 +65,14 @@ export default function AgentPanel({ isOpen }: AgentPanelProps) {
     } else {
       setIsInitialLoading(false);
     }
-  }, [isInstalled, lastFetched, activeAgentId, agents, dispatch, getAgentsData]);
+  }, [
+    isInstalled,
+    lastFetched,
+    activeAgentId,
+    agents,
+    dispatch,
+    getAgentsData,
+  ]);
 
   return (
     <aside
