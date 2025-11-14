@@ -26,7 +26,7 @@ const PYTHON_INSTALL_ARGS = [
 console.log('Installing mcp-cli Python package...');
 
 // Function to save installation priority to config file
-function savePriorityConfig(method: any, executablePath: any) {
+function savePriorityConfig(method: string, executablePath: string) {
   const configDir = path.join(os.homedir(), CONFIG_BASE_DIR);
   const configPath = path.join(configDir, CONFIG_FILE_NAME);
   const config = {
@@ -42,8 +42,12 @@ function savePriorityConfig(method: any, executablePath: any) {
     }
     fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
     console.log(`✅ Priority config saved to ${configPath}`);
-  } catch (error: any) {
-    console.warn(`⚠️  Could not save config file: ${error.message}`);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.warn(`⚠️  Could not save config file: ${error.message}`);
+    } else {
+      console.warn(`⚠️  Could not save config file: ${String(error)}`);
+    }
   }
 }
 
@@ -81,7 +85,7 @@ export async function installMcpCli(): Promise<boolean> {
     if (uvInstallResult) {
       return true; // Successfully installed with uv
     }
-  } catch (e) {
+  } catch {
     console.log('uv not found, trying pip...');
   }
 
@@ -93,7 +97,7 @@ export async function installMcpCli(): Promise<boolean> {
     try {
       pythonPath = which.sync(cmd);
       break;
-    } catch (e) {
+    } catch {
       // Continue to next command
     }
   }
@@ -128,7 +132,7 @@ export async function installMcpCli(): Promise<boolean> {
         reject(false);
       }
     });
-    pipProcess.on('error', (error: any) => {
+    pipProcess.on('error', (error: Error) => {
       console.error('❌ Error during installation:', error.message);
       reject(error);
     });

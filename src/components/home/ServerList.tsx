@@ -15,6 +15,7 @@ import { ServerData } from '@/types/mcp';
 import { filterServers, sortServers } from '@/utils/commonFunctions';
 import { ONE_HOUR_MS } from '@/utils/constants';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ReusablePagination } from '@/components/Pagination';
 
 type ServerListProps = {
   view: 'grid' | 'list';
@@ -37,6 +38,8 @@ export default function ServerList({ view }: ServerListProps) {
   } = useMcpService();
 
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 9;
 
   // Memoized filtering
   const filteredServers = useMemo(() => {
@@ -47,6 +50,17 @@ export default function ServerList({ view }: ServerListProps) {
   const sortedServers = useMemo(() => {
     return sortServers(filteredServers, sortBy);
   }, [filteredServers, sortBy]);
+
+  // Pagination calculations
+  const totalPages = Math.ceil(sortedServers.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedServers = sortedServers.slice(startIndex, endIndex);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, sortBy]);
 
   useEffect(() => {
     const fetchServers = async () => {
@@ -99,6 +113,12 @@ export default function ServerList({ view }: ServerListProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInstalled, activeAgent?.agent, projectLocation]);
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll to top of the server list when changing pages
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   if (isInitialLoading) {
     return (
       <div className="flex-1 overflow-y-auto scrollbar-thin p-2">
@@ -110,10 +130,19 @@ export default function ServerList({ view }: ServerListProps) {
               : 'flex flex-col'
           )}
         >
-          {[...Array(12)].map((_, i) => (
+          {[...Array(itemsPerPage)].map((_, i) => (
             <Skeleton key={i} className="h-32 w-full rounded-lg" />
           ))}
         </div>
+        {totalPages > 1 && (
+          <div className="mt-6 flex justify-center">
+            <ReusablePagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        )}
       </div>
     );
   }
@@ -125,29 +154,40 @@ export default function ServerList({ view }: ServerListProps) {
           <p className="text-muted-foreground">No servers found</p>
         </div>
       ) : (
-        <div
-          className={cn(
-            'gap-4',
-            view === 'grid'
-              ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-              : 'flex flex-col'
+        <>
+          <div
+            className={cn(
+              'gap-4',
+              view === 'grid'
+                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+                : 'flex flex-col'
+            )}
+          >
+            {paginatedServers.map((server, index) => (
+              <ServerCard
+                key={Object.keys(server.mcp)[0] || server.name}
+                view={view}
+                index={index}
+                server={server}
+                addServerByAgent={(agent: string, serverName: string) =>
+                  addServerByAgent(agent, serverName, projectLocation)
+                }
+                removeServerByAgent={(serverName: string, agent: string) =>
+                  removeServerByAgent(serverName, agent, projectLocation)
+                }
+              />
+            ))}
+          </div>
+          {totalPages > 1 && (
+            <div className="mt-6 flex justify-center">
+              <ReusablePagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
           )}
-        >
-          {sortedServers.map((server, index) => (
-            <ServerCard
-              key={Object.keys(server.mcp)[0] || server.name}
-              view={view}
-              index={index}
-              server={server}
-              addServerByAgent={(agent: string, serverName: string) =>
-                addServerByAgent(agent, serverName, projectLocation)
-              }
-              removeServerByAgent={(serverName: string, agent: string) =>
-                removeServerByAgent(serverName, agent, projectLocation)
-              }
-            />
-          ))}
-        </div>
+        </>
       )}
     </div>
   );

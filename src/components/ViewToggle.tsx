@@ -12,7 +12,7 @@ export default function ViewToggle({ view, onViewChange }: ViewToggleProps) {
       <button
         onClick={() => onViewChange('grid')}
         className={cn(
-          'flex h-8 w-8 items-center justify-center rounded-lg transition-colors',
+          'flex h-8 w-8 items-center justify-center rounded-lg transition-colors cursor-pointer',
           view === 'grid'
             ? 'bg-primary text-primary-foreground'
             : 'text-muted-foreground hover:text-foreground'
@@ -23,7 +23,7 @@ export default function ViewToggle({ view, onViewChange }: ViewToggleProps) {
       <button
         onClick={() => onViewChange('list')}
         className={cn(
-          'flex h-8 w-8 items-center justify-center rounded-lg transition-colors',
+          'flex h-8 w-8 items-center justify-center rounded-lg transition-colors cursor-pointer',
           view === 'list'
             ? 'bg-primary text-primary-foreground'
             : 'text-muted-foreground hover:text-foreground'

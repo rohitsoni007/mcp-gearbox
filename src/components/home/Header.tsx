@@ -16,6 +16,7 @@ import { selectSortBy } from '@/store/selectors/serverSelectors';
 import { useMcpService } from '@/hooks/useMcpService';
 import { useEffect, useState } from 'react';
 import { Download, Loader2 } from 'lucide-react';
+import AgentIcon from '../AgentIcon';
 
 interface HeaderProps {
   view: 'grid' | 'list';
@@ -48,15 +49,18 @@ export default function Header({ view, setView }: HeaderProps) {
   };
 
   return (
-    <header className="border-b border-border p-6 pb-2">
-      <div className="mb-6 flex items-start justify-between">
+    <header className="border-b border-border p-5 pb-2 pt-2">
+      <div className="mb-2 flex items-start justify-between">
         <div>
-          <h1 className="mb-2 text-3xl font-bold tracking-tight">
-            {activeAgent?.name || 'MCP'}
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Manage your local MCP server configuration
-          </p>
+          <div className="flex items-center gap-2 mb-2">
+            <AgentIcon agent={activeAgent} />
+            <h1 className="text-3xl font-bold tracking-tight">
+              {activeAgent?.name || 'MCP'}
+            </h1>
+            <span className="text-sm text-muted-foreground">
+              Manage your local MCP server configuration
+            </span>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           {!isInstalled && !activeAgent && (
@@ -82,7 +86,7 @@ export default function Header({ view, setView }: HeaderProps) {
           <div className="flex items-center gap-2 text-sm">
             <span className="text-muted-foreground">Sort by:</span>
             <Select value={localSortBy} onValueChange={handleSortChange}>
-              <SelectTrigger className="glass-card h-10 w-40 border-0">
+              <SelectTrigger className="glass-card h-10 w-40 border-0 cursor-pointer">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

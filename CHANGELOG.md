@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.4] - 2024-11-14
+- Added agent icon on selected agent on top
+- Added pagination on server list
+- cursor-pointer where clickable and reduce header space
+
+
 ## [0.0.3] - 2024-11-13
 
 - Project Level Configuration Support
