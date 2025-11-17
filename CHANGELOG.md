@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.5] - 2024-11-17
+- Added avatar url on server card
+- cli version to 0.0.14
+
 ## [0.0.4] - 2024-11-14
 - Added agent icon on selected agent on top
 - Added pagination on server list

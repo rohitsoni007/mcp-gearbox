@@ -7,6 +7,7 @@ export interface Server {
   stargazer_count: number;
   by: string;
   isEnabled?: boolean;
+  avatar_url: string;
 }
 
 interface ServerState {
