@@ -129,6 +129,7 @@ MCP Gearbox seamlessly integrates with popular AI code assistants and developmen
 | **[Qoder](https://qoder.com)** | ✅ |  |
 | **[Copilot CLI](https://github.com/github/copilot-cli)** | ✅ |  |
 | **[LM Studio](https://lmstudio.ai)** | ✅ |  |
+| **[Google Antigravity](https://antigravity.google)** | ✅ |  |
 
 ## ⚙️ Technology Stack
 
