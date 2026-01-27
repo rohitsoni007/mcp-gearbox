@@ -37,7 +37,9 @@ export default function AgentIcon({ agent, className }: AgentIconProps) {
     case 'copilot':
       return <Copilot />;
     case 'antigravity':
-      return <img src={antigravityIcon} alt={agent.name} className={ImgClass} />;
+      return (
+        <img src={antigravityIcon} alt={agent.name} className={ImgClass} />
+      );
     case 'gemini':
       return <img src={geminiIcon} alt={agent.name} className={ImgClass} />;
     case 'cursor':

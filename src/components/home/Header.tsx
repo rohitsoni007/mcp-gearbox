@@ -12,7 +12,12 @@ import { Button } from '@/components/ui/button';
 import { useActiveAgent } from '@/hooks/useActiveAgent';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setSortBy } from '@/store/slices/serverSlice';
+import { setActiveAgent } from '@/store/slices/agentSlice';
 import { selectSortBy } from '@/store/selectors/serverSelectors';
+import {
+  selectInstalledAgents,
+  selectIsAgentPanelOpen,
+} from '@/store/selectors/agentSelectors';
 import { useMcpService } from '@/hooks/useMcpService';
 import { useEffect, useState } from 'react';
 import { Download, Loader2 } from 'lucide-react';
@@ -24,9 +29,11 @@ interface HeaderProps {
 }
 
 export default function Header({ view, setView }: HeaderProps) {
+  const isAgentPanelOpen = useAppSelector(selectIsAgentPanelOpen);
   const dispatch = useAppDispatch();
   const activeAgent = useActiveAgent();
   const reduxSortBy = useAppSelector(selectSortBy);
+  const installedAgents = useAppSelector(selectInstalledAgents);
   const [localSortBy, setLocalSortBy] = useState(reduxSortBy);
   const { isInstalled, isInstalling, installCli } = useMcpService();
 
@@ -48,16 +55,53 @@ export default function Header({ view, setView }: HeaderProps) {
     setLocalSortBy(value);
   };
 
+  const handleAgentChange = (agentId: string) => {
+    dispatch(setActiveAgent(agentId));
+  };
+
   return (
     <header className="border-b border-border p-5 pb-2 pt-2">
       <div className="mb-2 flex items-start justify-between">
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <AgentIcon agent={activeAgent} />
-            <h1 className="text-3xl font-bold tracking-tight">
-              {activeAgent?.name || 'MCP'}
-            </h1>
-          </div>
+          {isAgentPanelOpen && (
+            <div className="flex items-center gap-2 mb-2">
+              <AgentIcon agent={activeAgent} />
+              <h1 className="text-3xl font-bold tracking-tight">
+                {activeAgent?.name || 'MCP'}
+              </h1>
+            </div>
+          )}
+          {/* Agent Select Dropdown when sidebar is hidden */}
+          {!isAgentPanelOpen && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">AI Agent:</span>
+              <Select
+                value={activeAgent?.agent || ''}
+                onValueChange={handleAgentChange}
+              >
+                <SelectTrigger className="glass-card h-9 w-48 border-0 cursor-pointer">
+                  <div className="flex items-center gap-2">
+                    {activeAgent && (
+                      <AgentIcon agent={activeAgent} className="h-4 w-4" />
+                    )}
+                    <span className="truncate">
+                      {activeAgent?.name || 'Select agent'}
+                    </span>
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  {installedAgents.map(agent => (
+                    <SelectItem key={agent.agent} value={agent.agent}>
+                      <div className="flex items-center gap-2">
+                        <AgentIcon agent={agent} className="h-4 w-4" />
+                        <span>{agent.name}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-3">
           {!isInstalled && !activeAgent && (

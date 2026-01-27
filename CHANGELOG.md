@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.1.0] - 2026-01-27
+## [0.2.0] - 2025-01-27
+
+### Added
+- Agent selection dropdown in header when sidebar is hidden
+- Sidebar navigation is now hidden by default
+
+## [0.1.0] - 2025-01-27
 - Added support for macOS 12 amd64 arch
 
 ## [0.0.6] - 2025-11-17
