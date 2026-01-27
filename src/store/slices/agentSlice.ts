@@ -16,12 +16,14 @@ interface AgentState {
   agents: Agent[];
   activeAgentId: string | null;
   lastFetched: number | null;
+  isAgentPanelOpen: boolean;
 }
 
 const initialState: AgentState = {
   agents: [],
   activeAgentId: null,
   lastFetched: null,
+  isAgentPanelOpen: false,
 };
 
 const agentSlice = createSlice({
@@ -43,8 +45,12 @@ const agentSlice = createSlice({
         state.agents[index] = action.payload;
       }
     },
+    setAgentPanelOpen: (state, action: PayloadAction<boolean>) => {
+      state.isAgentPanelOpen = action.payload;
+    },
   },
 });
 
-export const { setAgents, setActiveAgent, updateAgent } = agentSlice.actions;
+export const { setAgents, setActiveAgent, updateAgent, setAgentPanelOpen } =
+  agentSlice.actions;
 export default agentSlice.reducer;

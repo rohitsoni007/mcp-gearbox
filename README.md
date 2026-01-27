@@ -231,16 +231,6 @@ Need help with this AI integration tool or have questions about managing MCP ser
 
 As a productivity tool for AI developers, we strive to provide excellent support for our community.
 
-## 🗺️ Roadmap
-
-Our future plans for enhancing this AI integration tool include:
-
-- [ ] Server configuration editor
-- [ ] Custom server addition
-- [ ] Server health monitoring
-- [ ] Backup and restore configurations
-- [ ] Dark/light theme toggle
-- [ ] Multi-language support
 
 ## 🙏 Acknowledgements
 

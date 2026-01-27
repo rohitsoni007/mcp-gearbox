@@ -12,3 +12,6 @@ export const selectActiveAgentId = (state: RootState) =>
 
 export const selectInstalledAgents = (state: RootState) =>
   state.agent.agents.filter(agent => agent.installed);
+
+export const selectIsAgentPanelOpen = (state: RootState) =>
+  state.agent.isAgentPanelOpen;

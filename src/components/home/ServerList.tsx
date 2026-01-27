@@ -179,7 +179,7 @@ export default function ServerList({ view }: ServerListProps) {
             ))}
           </div>
           {totalPages > 1 && (
-            <div className="mt-6 flex justify-center">
+            <div className="mt-2 flex justify-center">
               <ReusablePagination
                 currentPage={currentPage}
                 totalPages={totalPages}
