@@ -67,13 +67,13 @@ jobs:
     - name: Lint code
       run: npm run lint
       
-    - name: Build application
-      run: |
-        if [ "${{ matrix.os }}" = "macos-latest" ]; then
-          npm run make -- --arch=${{ matrix.arch }}
-        else
-          npm run make
-        fi
+    - name: Build application (macOS)
+      if: matrix.os == 'macos-latest'
+      run: npm run make -- --arch=${{ matrix.arch }}
+      
+    - name: Build application (Windows/Linux)
+      if: matrix.os != 'macos-latest'
+      run: npm run make
       
     - name: List build output (Unix)
       if: runner.os != 'Windows'
@@ -134,15 +134,22 @@ jobs:
     - name: Determine release tag
       id: release-tag
       run: |
-        if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ inputs.release_tag }}" ]]; then
-          echo "tag=${{ inputs.release_tag }}" >> $GITHUB_OUTPUT
-          echo "name=Release ${{ inputs.release_tag }}" >> $GITHUB_OUTPUT
-        elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == refs/tags/* ]]; then
-          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-          echo "name=Release ${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        EVENT_NAME="${{ github.event_name }}"
+        INPUT_TAG="${{ inputs.release_tag }}"
+        REF="${{ github.ref }}"
+        
+        if [ "$EVENT_NAME" = "workflow_dispatch" ] && [ -n "$INPUT_TAG" ]; then
+          echo "tag=$INPUT_TAG" >> $GITHUB_OUTPUT
+          echo "name=Release $INPUT_TAG" >> $GITHUB_OUTPUT
+        elif [ "$EVENT_NAME" = "push" ] && [ "$REF" = "refs/tags/*" ]; then
+          TAG_NAME="${GITHUB_REF#refs/tags/}"
+          echo "tag=$TAG_NAME" >> $GITHUB_OUTPUT
+          echo "name=Release $TAG_NAME" >> $GITHUB_OUTPUT
         else
-          echo "tag=v${{ steps.package-version.outputs.version }}-${{ steps.timestamp.outputs.timestamp }}" >> $GITHUB_OUTPUT
-          echo "name=Release v${{ steps.package-version.outputs.version }} (${{ steps.timestamp.outputs.timestamp }})" >> $GITHUB_OUTPUT
+          VERSION="${{ steps.package-version.outputs.version }}"
+          TIMESTAMP="${{ steps.timestamp.outputs.timestamp }}"
+          echo "tag=v$VERSION-$TIMESTAMP" >> $GITHUB_OUTPUT
+          echo "name=Release v$VERSION ($TIMESTAMP)" >> $GITHUB_OUTPUT
         fi
       
     - name: Download all artifacts
