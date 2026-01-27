@@ -66,7 +66,6 @@ Get started immediately with our pre-built binaries for maximum convenience:
 - **Windows**: `mcp-gearbox-setup.exe`
 - **macOS Intel (x64)**: `mcp-gearbox-x64.dmg`
 - **macOS Apple Silicon (arm64)**: `mcp-gearbox-arm64.dmg`
-- **macOS Universal**: `mcp-gearbox-universal.dmg` *(runs on both Intel and Apple Silicon)*
 - **Linux**: `mcp-gearbox.deb` or `mcp-gearbox.rpm`
 
 This cross-platform AI integration tool is ready to enhance your productivity workflow.
