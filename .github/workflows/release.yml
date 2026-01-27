@@ -48,6 +48,7 @@ jobs:
         APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
         APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
         KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+      shell: bash
       run: |
         if [ -n "$APPLE_CERTIFICATE" ]; then
           echo $APPLE_CERTIFICATE | base64 --decode > certificate.p12
@@ -58,7 +59,8 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" build.keychain
         fi
         
-    - name: Build and package
+    - name: Build and package (macOS)
+      if: matrix.os == 'macos-latest'
       env:
         # macOS notarization
         APPLE_ID: ${{ secrets.APPLE_ID }}
@@ -67,12 +69,19 @@ jobs:
         # Windows code signing
         WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
         WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
-      run: |
-        if [ "${{ matrix.os }}" = "macos-latest" ]; then
-          npm run publish -- --arch=${{ matrix.arch }}
-        else
-          npm run publish
-        fi
+      run: npm run publish -- --arch=${{ matrix.arch }}
+      
+    - name: Build and package (Windows/Linux)
+      if: matrix.os != 'macos-latest'
+      env:
+        # macOS notarization
+        APPLE_ID: ${{ secrets.APPLE_ID }}
+        APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        # Windows code signing
+        WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
+        WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+      run: npm run publish
       
     - name: Upload release assets
       uses: softprops/action-gh-release@v1
