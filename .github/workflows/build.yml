@@ -27,90 +27,110 @@ permissions:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
-    
+
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        # Test both x64 and arm64 architectures on macOS
         include:
-          - os: macos-latest
+          # ---------- Linux ----------
+          - os: ubuntu-latest
+            platform: linux
+
+          # ---------- Windows ----------
+          - os: windows-latest
+            platform: win32
+
+          # ---------- macOS Intel (x64) ----------
+          - os: macos-13
+            platform: darwin
             arch: x64
+
+          # ---------- macOS Apple Silicon (arm64) ----------
           - os: macos-latest
+            platform: darwin
             arch: arm64
-        
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
-    
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-        
-    - name: Install dependencies (macOS)
-      if: matrix.os == 'macos-latest'
-      run: npm ci --ignore-scripts
-      
-    - name: Install dependencies (Windows/Linux)
-      if: matrix.os != 'macos-latest'
-      run: npm ci
-      
-    - name: Type check
-      run: npm run type-check
-      
-    - name: Lint code
-      run: npm run lint
-      
-    - name: Build application (macOS)
-      if: matrix.os == 'macos-latest'
-      run: npm run make -- --arch=${{ matrix.arch }}
-      
-    - name: Build application (Windows/Linux)
-      if: matrix.os != 'macos-latest'
-      run: npm run make
-      
-    - name: List build output (Unix)
-      if: runner.os != 'Windows'
-      run: |
-        echo "Build output structure:"
-        find out -type f -name "*" 2>/dev/null || echo "No out directory found"
-        ls -la out/ 2>/dev/null || echo "No out directory"
-        
-    - name: List build output (Windows)
-      if: runner.os == 'Windows'
-      run: |
-        echo "Build output structure:"
-        if (Test-Path out) { Get-ChildItem -Recurse out | Select-Object FullName } else { echo "No out directory found" }
-      
-    - name: Upload artifacts (Windows)
-      if: matrix.os == 'windows-latest'
-      uses: actions/upload-artifact@v4
-      with:
-        name: electron-app-windows
-        path: out/make/**/*
-        retention-days: 30
-        
-    - name: Upload artifacts (macOS)
-      if: matrix.os == 'macos-latest'
-      uses: actions/upload-artifact@v4
-      with:
-        name: electron-app-macos-${{ matrix.arch }}
-        path: out/make/**/*
-        retention-days: 30
-        
-    - name: Upload artifacts (Linux)
-      if: matrix.os == 'ubuntu-latest'
-      uses: actions/upload-artifact@v4
-      with:
-        name: electron-app-linux
-        path: out/make/**/*
-        retention-days: 30
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Setup Python (node-gyp)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run type-check
+
+      - name: Lint
+        run: npm run lint
+
+      # ---------- macOS ----------
+      - name: Clear Electron cache (macOS)
+        if: matrix.platform == 'darwin'
+        run: |
+          rm -rf ~/.electron ~/.cache/electron
+
+      - name: Build (macOS)
+        if: matrix.platform == 'darwin'
+        run: |
+          npm run make -- \
+            --platform=darwin \
+            --arch=${{ matrix.arch }}
+
+      # ---------- Windows / Linux ----------
+      - name: Build (Windows / Linux)
+        if: matrix.platform != 'darwin'
+        run: npm run make
+
+      # ---------- Debug output ----------
+      - name: List build output
+        shell: bash
+        run: |
+          echo "===== out/make ====="
+          find out/make -type f || true
+
+      # ---------- Upload artifacts ----------
+      - name: Upload artifacts (Windows)
+        if: matrix.platform == 'win32'
+        uses: actions/upload-artifact@v4
+        with:
+          name: electron-windows
+          path: out/make/**/*
+          retention-days: 30
+
+      - name: Upload artifacts (macOS x64)
+        if: matrix.platform == 'darwin' && matrix.arch == 'x64'
+        uses: actions/upload-artifact@v4
+        with:
+          name: electron-macos-x64
+          path: out/make/**/*
+          retention-days: 30
+
+      - name: Upload artifacts (macOS arm64)
+        if: matrix.platform == 'darwin' && matrix.arch == 'arm64'
+        uses: actions/upload-artifact@v4
+        with:
+          name: electron-macos-arm64
+          path: out/make/**/*
+          retention-days: 30
+
+      - name: Upload artifacts (Linux)
+        if: matrix.platform == 'linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: electron-linux
+          path: out/make/**/*
+          retention-days: 30
 
   release:
     needs: build
@@ -118,69 +138,34 @@ jobs:
     if: |
       (github.event_name == 'workflow_dispatch' && inputs.create_release == true) ||
       startsWith(github.ref, 'refs/tags/v')
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Get package version
-      id: package-version
-      run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-      
-    - name: Generate timestamp
-      id: timestamp
-      run: echo "timestamp=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
-      
-    - name: Determine release tag
-      id: release-tag
-      run: |
-        EVENT_NAME="${{ github.event_name }}"
-        INPUT_TAG="${{ inputs.release_tag }}"
-        REF="${{ github.ref }}"
-        
-        if [ "$EVENT_NAME" = "workflow_dispatch" ] && [ -n "$INPUT_TAG" ]; then
-          echo "tag=$INPUT_TAG" >> $GITHUB_OUTPUT
-          echo "name=Release $INPUT_TAG" >> $GITHUB_OUTPUT
-        elif [ "$EVENT_NAME" = "push" ] && [ "$REF" = "refs/tags/*" ]; then
-          TAG_NAME="${GITHUB_REF#refs/tags/}"
-          echo "tag=$TAG_NAME" >> $GITHUB_OUTPUT
-          echo "name=Release $TAG_NAME" >> $GITHUB_OUTPUT
-        else
-          VERSION="${{ steps.package-version.outputs.version }}"
-          TIMESTAMP="${{ steps.timestamp.outputs.timestamp }}"
-          echo "tag=v$VERSION-$TIMESTAMP" >> $GITHUB_OUTPUT
-          echo "name=Release v$VERSION ($TIMESTAMP)" >> $GITHUB_OUTPUT
-        fi
-      
-    - name: Download all artifacts
-      uses: actions/download-artifact@v4
-      
-    - name: Create Release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: ${{ steps.release-tag.outputs.tag }}
-        name: ${{ steps.release-tag.outputs.name }}
-        files: |
-          electron-app-windows/**/*
-          electron-app-macos-x64/**/*
-          electron-app-macos-arm64/**/*
-          electron-app-linux/**/*
-        draft: false
-        prerelease: false
-        generate_release_notes: true
-        body: |
-          🚀 **Manual Release**
-          
-          **Version:** ${{ steps.package-version.outputs.version }}
-          **Build Date:** ${{ steps.timestamp.outputs.timestamp }}
-          **Commit:** ${{ github.sha }}
-          **Trigger:** ${{ github.event_name }}
-          
-          This release was manually triggered from the GitHub Actions interface.
-          
-          ## 📦 Downloads
-          - **Windows**: `.exe` installer and `.zip` portable
-          - **macOS**: `.dmg` installer and `.zip` portable  
-          - **Linux**: `.deb` and `.rpm` packages, plus `.zip` portable
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Determine release tag
+        id: tag
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          elif [[ -n "${{ inputs.release_tag }}" ]]; then
+            echo "tag=${{ inputs.release_tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=v$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: Release ${{ steps.tag.outputs.tag }}
+          files: |
+            electron-windows/**/*
+            electron-macos-x64/**/*
+            electron-macos-arm64/**/*
+            electron-linux/**/*
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
