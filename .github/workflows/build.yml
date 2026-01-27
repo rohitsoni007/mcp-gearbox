@@ -41,7 +41,7 @@ jobs:
             platform: win32
 
           # ---------- macOS Intel (x64) ----------
-          - os: macos-12
+          - os: macos-13
             platform: darwin
             arch: x64
 
