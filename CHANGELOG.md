@@ -7,22 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.0.6] - 2024-11-17
+## [0.1.0] - 2026-01-27
+- Added support for macOS 12 amd64 arch
+
+## [0.0.6] - 2025-11-17
 - remove top helper text
 - Added support google antigravity
 - cli version to 0.0.15
 
-## [0.0.5] - 2024-11-17
+## [0.0.5] - 2025-11-17
 - Added avatar url on server card
 - cli version to 0.0.14
 
-## [0.0.4] - 2024-11-14
+## [0.0.4] - 2025-11-14
 - Added agent icon on selected agent on top
 - Added pagination on server list
 - cursor-pointer where clickable and reduce header space
 
 
-## [0.0.3] - 2024-11-13
+## [0.0.3] - 2025-11-13
 
 - Project Level Configuration Support
 - Light theme and Dark theme Toggle
@@ -30,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - skeleton loading in agent & server
 - Add Arch Linux AUR packaging (contributed by [@Logic-H](https://github.com/Logic-H))
 
-## [0.0.2] - 2024-11-12
+## [0.0.2] - 2025-11-12
 - Copilot CLI Support
 - Disable non installed ai agent & ui
 - server card status- starting stopping, in row 3 card ui
@@ -45,7 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix MCP CLI toast on startup
 
 
-## [0.0.1] - 2024-11-09
+## [0.0.1] - 2025-11-09
 
 ### Added
 - Initial release

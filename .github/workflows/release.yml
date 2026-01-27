@@ -17,6 +17,10 @@ jobs:
             platform: win32
           - os: macos-latest
             platform: darwin
+            arch: x64
+          - os: macos-latest
+            platform: darwin
+            arch: arm64
             
     steps:
     - name: Checkout code
@@ -63,7 +67,12 @@ jobs:
         # Windows code signing
         WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
         WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
-      run: npm run publish
+      run: |
+        if [ "${{ matrix.os }}" = "macos-latest" ]; then
+          npm run publish -- --arch=${{ matrix.arch }}
+        else
+          npm run publish
+        fi
       
     - name: Upload release assets
       uses: softprops/action-gh-release@v1
