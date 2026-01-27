@@ -31,6 +31,12 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
+        # Test both x64 and arm64 architectures on macOS
+        include:
+          - os: macos-latest
+            arch: x64
+          - os: macos-latest
+            arch: arm64
         
     steps:
     - name: Checkout code
@@ -62,7 +68,12 @@ jobs:
       run: npm run lint
       
     - name: Build application
-      run: npm run make
+      run: |
+        if [ "${{ matrix.os }}" = "macos-latest" ]; then
+          npm run make -- --arch=${{ matrix.arch }}
+        else
+          npm run make
+        fi
       
     - name: List build output (Unix)
       if: runner.os != 'Windows'
@@ -89,7 +100,7 @@ jobs:
       if: matrix.os == 'macos-latest'
       uses: actions/upload-artifact@v4
       with:
-        name: electron-app-macos
+        name: electron-app-macos-${{ matrix.arch }}
         path: out/make/**/*
         retention-days: 30
         
@@ -144,7 +155,8 @@ jobs:
         name: ${{ steps.release-tag.outputs.name }}
         files: |
           electron-app-windows/**/*
-          electron-app-macos/**/*
+          electron-app-macos-x64/**/*
+          electron-app-macos-arm64/**/*
           electron-app-linux/**/*
         draft: false
         prerelease: false
