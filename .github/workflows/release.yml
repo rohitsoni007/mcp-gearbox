@@ -2,105 +2,119 @@ name: Release
 
 on:
   push:
-    tags: [ 'v*' ]
+    tags:
+      - 'v*'
 
 jobs:
   release:
     runs-on: ${{ matrix.os }}
-    
+
     strategy:
+      fail-fast: false
       matrix:
         include:
+          # -------- Linux --------
           - os: ubuntu-latest
             platform: linux
+
+          # -------- Windows --------
           - os: windows-latest
             platform: win32
-          - os: macos-latest
+
+          # -------- macOS Intel (x64) --------
+          - os: macos-12
             platform: darwin
             arch: x64
+
+          # -------- macOS Apple Silicon (arm64) --------
           - os: macos-latest
             platform: darwin
             arch: arm64
-            
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Setup Python (for node-gyp on Windows)
-      if: matrix.os == 'windows-latest'
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.x'
-        
-    # macOS code signing setup
-    - name: Setup macOS certificate
-      if: matrix.os == 'macos-latest'
-      env:
-        APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-        APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-        KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-      shell: bash
-      run: |
-        if [ -n "$APPLE_CERTIFICATE" ]; then
-          echo $APPLE_CERTIFICATE | base64 --decode > certificate.p12
-          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-          security import certificate.p12 -k build.keychain -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" build.keychain
-        fi
-        
-    - name: Build and package (macOS)
-      if: matrix.os == 'macos-latest'
-      env:
-        # macOS notarization
-        APPLE_ID: ${{ secrets.APPLE_ID }}
-        APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        # Windows code signing
-        WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
-        WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
-      run: |
-        npm run publish -- --arch=${{ matrix.arch }}
-        echo "Build completed for ${{ matrix.arch }}"
-        echo "Listing output directory:"
-        ls -la out/make/
-        echo "Finding all zip files:"
-        find out/make -name "*.zip" -type f
-      
-    - name: Build and package (Windows/Linux)
-      if: matrix.os != 'macos-latest'
-      env:
-        # macOS notarization
-        APPLE_ID: ${{ secrets.APPLE_ID }}
-        APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        # Windows code signing
-        WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
-        WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
-      run: npm run publish
-      
-    - name: Upload release assets
-      uses: softprops/action-gh-release@v1
-      with:
-        files: |
-          out/make/**/*.exe
-          out/make/**/*.msi
-          out/make/**/*.dmg
-          out/make/**/*.deb
-          out/make/**/*.rpm
-          out/make/**/*.zip
-        draft: false
-        prerelease: false
-        generate_release_notes: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Required for node-gyp on Windows
+      - name: Setup Python (Windows)
+        if: matrix.os == 'windows-latest'
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      # ---------------- macOS Code Signing ----------------
+      - name: Setup macOS certificate
+        if: matrix.platform == 'darwin'
+        shell: bash
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          if [ -n "$APPLE_CERTIFICATE" ]; then
+            echo "$APPLE_CERTIFICATE" | base64 --decode > certificate.p12
+            security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+            security default-keychain -s build.keychain
+            security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+            security import certificate.p12 \
+              -k build.keychain \
+              -P "$APPLE_CERTIFICATE_PASSWORD" \
+              -T /usr/bin/codesign
+            security set-key-partition-list \
+              -S apple-tool:,apple:,codesign: \
+              -s -k "$KEYCHAIN_PASSWORD" build.keychain
+          fi
+
+      # ---------------- Debug Arch (optional but useful) ----------------
+      - name: Debug architecture
+        if: matrix.platform == 'darwin'
+        run: |
+          uname -m
+          node -p "process.arch"
+
+      # ---------------- Build macOS ----------------
+      - name: Build & publish (macOS)
+        if: matrix.platform == 'darwin'
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+
+          WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
+          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+        run: |
+          npm run publish -- \
+            --platform=darwin \
+            --arch=${{ matrix.arch }}
+
+      # ---------------- Build Windows & Linux ----------------
+      - name: Build & publish (Windows / Linux)
+        if: matrix.platform != 'darwin'
+        env:
+          WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
+          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+        run: npm run publish
+
+      # ---------------- Upload Release Assets ----------------
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            out/make/**/*.exe
+            out/make/**/*.msi
+            out/make/**/*.dmg
+            out/make/**/*.zip
+            out/make/**/*.deb
+            out/make/**/*.rpm
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
